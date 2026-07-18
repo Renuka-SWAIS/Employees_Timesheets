@@ -7,9 +7,25 @@ export default function EditProfileModal({
   onClose,
   onSave,
 }) {
-  const [name, setName] = useState(employee.EmployeeName);
-  const [department, setDepartment] = useState(employee.Department);
-  const [designation, setDesignation] = useState(employee.Designation);
+  const [name, setName] = useState(
+    employee.EmployeeName || ""
+  );
+
+  const [department, setDepartment] = useState(
+    employee.Department || ""
+  );
+
+  const [designation, setDesignation] = useState(
+    employee.Designation || ""
+  );
+
+  const handleSave = () => {
+    onSave({
+      EmployeeName: name,
+      Department: department,
+      Designation: designation,
+    });
+  };
 
   return (
     <div
@@ -26,62 +42,72 @@ export default function EditProfileModal({
       <div
         style={{
           background: "#fff",
-          padding: "30px",
-          borderRadius: "12px",
-          width: "450px",
-          boxShadow: "0 5px 15px rgba(0,0,0,0.2)",
+          width: 450,
+          borderRadius: 12,
+          padding: 25,
+          boxShadow: "0 5px 20px rgba(0,0,0,.2)",
         }}
       >
-        <h2 style={{ marginBottom: "20px" }}>
+        <h2
+          style={{
+            marginBottom: 20,
+          }}
+        >
           Edit Profile
         </h2>
 
-        <div style={{ marginBottom: "15px" }}>
+        <div style={{ marginBottom: 15 }}>
           <label>Name</label>
 
           <input
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) =>
+              setName(e.target.value)
+            }
             style={{
               width: "100%",
-              padding: "10px",
-              marginTop: "5px",
-              borderRadius: "8px",
+              padding: 10,
+              marginTop: 5,
+              borderRadius: 8,
               border: "1px solid #ccc",
             }}
           />
         </div>
 
-        <div style={{ marginBottom: "15px" }}>
+        <div style={{ marginBottom: 15 }}>
           <label>Department</label>
 
           <input
             type="text"
             value={department}
-            onChange={(e) => setDepartment(e.target.value)}
+            onChange={(e) =>
+              setDepartment(e.target.value)
+            }
             style={{
               width: "100%",
-              padding: "10px",
-              marginTop: "5px",
-              borderRadius: "8px",
+              padding: 10,
+              marginTop: 5,
+              borderRadius: 8,
               border: "1px solid #ccc",
             }}
           />
         </div>
 
-        <div style={{ marginBottom: "20px" }}>
+        <div style={{ marginBottom: 20 }}>
           <label>Designation</label>
 
           <input
             type="text"
             value={designation}
-            onChange={(e) => setDesignation(e.target.value)}
+            onChange={(e) =>
+              setDesignation(e.target.value)
+            }
             style={{
               width: "100%",
-              padding: "10px",
-              marginTop: "5px",
-              borderRadius: "8px",
+              padding: 10,
+              marginTop: 5,
+              borderRadius: 8,
               border: "1px solid #ccc",
             }}
           />
@@ -91,7 +117,7 @@ export default function EditProfileModal({
           style={{
             display: "flex",
             justifyContent: "flex-end",
-            gap: "10px",
+            gap: 10,
           }}
         >
           <button
@@ -99,8 +125,8 @@ export default function EditProfileModal({
             style={{
               padding: "10px 20px",
               border: "none",
-              borderRadius: "8px",
-              background: "#ccc",
+              borderRadius: 8,
+              background: "#ddd",
               cursor: "pointer",
             }}
           >
@@ -108,23 +134,17 @@ export default function EditProfileModal({
           </button>
 
           <button
-            onClick={() =>
-              onSave({
-                EmployeeName: name,
-                Department: department,
-                Designation: designation,
-              })
-            }
+            onClick={handleSave}
             style={{
               padding: "10px 20px",
               border: "none",
-              borderRadius: "8px",
+              borderRadius: 8,
               background: "#2563eb",
               color: "#fff",
               cursor: "pointer",
             }}
           >
-            Save
+            Save Changes
           </button>
         </div>
       </div>

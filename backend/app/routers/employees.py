@@ -1,35 +1,65 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    UploadFile,
+    File,
+    HTTPException,
+)
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from typing import Optional
 from uuid import uuid4
 from datetime import datetime
+import os
+import shutil
 
 from app.database.database import get_db
 from app.models.employee import Employee
 from app.schemas.employee import EmployeeCreate
 from app.utils.dependencies import get_current_user
 
-import os
-import shutil
-
 router = APIRouter(
     prefix="/employees",
-    tags=["Employees"]
+    tags=["Employees"],
 )
 
+UPLOAD_FOLDER = "uploads"
 
-# ==========================
-# Request Model (Update)
-# ==========================
+
+# =====================================================
+# Request Model
+# =====================================================
+
 class EmployeeUpdate(BaseModel):
-    EmployeeName: str
-    Department: str
-    Designation: str
+    EmployeeName: Optional[str] = None
+    Department: Optional[str] = None
+    Designation: Optional[str] = None
 
 
-# ==========================
-# Get All Employees
-# ==========================
+# =====================================================
+# Helper
+# =====================================================
+
+def get_employee_by_id(db: Session, employee_id: str):
+    employee = (
+        db.query(Employee)
+        .filter(Employee.EmployeeID == employee_id)
+        .first()
+    )
+
+    if not employee:
+        raise HTTPException(
+            status_code=404,
+            detail="Employee not found",
+        )
+
+    return employee
+
+
+# =====================================================
+# Get All Employees (Admin)
+# =====================================================
+
 @router.get("/")
 def get_employees(
     db: Session = Depends(get_db),
@@ -39,7 +69,7 @@ def get_employees(
     if current_user["role"] != "Admin":
         raise HTTPException(
             status_code=403,
-            detail="Only Admin can view employees"
+            detail="Only Admin can view employees",
         )
 
     employees = db.query(Employee).all()
@@ -60,9 +90,38 @@ def get_employees(
     ]
 
 
-# ==========================
+# =====================================================
+# Logged In User Profile
+# =====================================================
+
+@router.get("/me")
+def get_my_profile(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+
+    employee = get_employee_by_id(
+        db,
+        current_user["employee_id"],
+    )
+
+    return {
+        "EmployeeID": str(employee.EmployeeID),
+        "EmployeeCode": employee.EmployeeCode,
+        "EmployeeName": employee.EmployeeName,
+        "EmailID": employee.EmailID,
+        "RoleType": employee.RoleType,
+        "Department": employee.Department,
+        "Designation": employee.Designation,
+        "Status": employee.Status,
+        "PhotoURL": employee.PhotoURL,
+    }
+
+
+# =====================================================
 # Create Employee
-# ==========================
+# =====================================================
+
 @router.post("/")
 def create_employee(
     employee: EmployeeCreate,
@@ -73,7 +132,7 @@ def create_employee(
     if current_user["role"] != "Admin":
         raise HTTPException(
             status_code=403,
-            detail="Only Admin can create employees"
+            detail="Only Admin can create employees",
         )
 
     existing = (
@@ -85,7 +144,7 @@ def create_employee(
     if existing:
         raise HTTPException(
             status_code=400,
-            detail="Employee email already exists"
+            detail="Employee already exists",
         )
 
     new_employee = Employee(
@@ -112,9 +171,10 @@ def create_employee(
     }
 
 
-# ==========================
-# Upload Employee Photo
-# ==========================
+# =====================================================
+# Upload Photo
+# =====================================================
+
 @router.post("/{employee_id}/photo")
 def upload_photo(
     employee_id: str,
@@ -123,29 +183,33 @@ def upload_photo(
     current_user: dict = Depends(get_current_user),
 ):
 
-    if current_user["role"] != "Admin":
+    if (
+        current_user["role"] != "Admin"
+        and str(current_user["employee_id"]) != employee_id
+    ):
         raise HTTPException(
             status_code=403,
-            detail="Only Admin can upload photos"
+            detail="Access denied",
         )
 
-    employee = (
-        db.query(Employee)
-        .filter(Employee.EmployeeID == employee_id)
-        .first()
-    )
+    employee = get_employee_by_id(db, employee_id)
 
-    if not employee:
+    extension = photo.filename.split(".")[-1].lower()
+
+    if extension not in ["jpg", "jpeg", "png"]:
         raise HTTPException(
-            status_code=404,
-            detail="Employee not found"
+            status_code=400,
+            detail="Only jpg, jpeg and png allowed",
         )
 
-    os.makedirs("uploads", exist_ok=True)
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-    extension = photo.filename.split(".")[-1]
     filename = f"{employee.EmployeeID}.{extension}"
-    filepath = os.path.join("uploads", filename)
+
+    filepath = os.path.join(
+        UPLOAD_FOLDER,
+        filename,
+    )
 
     with open(filepath, "wb") as buffer:
         shutil.copyfileobj(photo.file, buffer)
@@ -162,9 +226,10 @@ def upload_photo(
     }
 
 
-# ==========================
+# =====================================================
 # Update Employee
-# ==========================
+# =====================================================
+
 @router.put("/{employee_id}")
 def update_employee(
     employee_id: str,
@@ -173,27 +238,26 @@ def update_employee(
     current_user: dict = Depends(get_current_user),
 ):
 
-    if current_user["role"] != "Admin":
+    if (
+        current_user["role"] != "Admin"
+        and str(current_user["employee_id"]) != employee_id
+    ):
         raise HTTPException(
             status_code=403,
-            detail="Only Admin can update employees"
+            detail="Access denied",
         )
 
-    employee = (
-        db.query(Employee)
-        .filter(Employee.EmployeeID == employee_id)
-        .first()
-    )
+    employee = get_employee_by_id(db, employee_id)
 
-    if not employee:
-        raise HTTPException(
-            status_code=404,
-            detail="Employee not found"
-        )
+    if data.EmployeeName is not None:
+        employee.EmployeeName = data.EmployeeName
 
-    employee.EmployeeName = data.EmployeeName
-    employee.Department = data.Department
-    employee.Designation = data.Designation
+    if data.Department is not None:
+        employee.Department = data.Department
+
+    if data.Designation is not None:
+        employee.Designation = data.Designation
+
     employee.ModifiedDate = datetime.now()
 
     db.commit()
@@ -211,9 +275,10 @@ def update_employee(
     }
 
 
-# ==========================
-# Get Single Employee
-# ==========================
+# =====================================================
+# Get Employee By ID
+# =====================================================
+
 @router.get("/{employee_id}")
 def get_employee(
     employee_id: str,
@@ -221,23 +286,16 @@ def get_employee(
     current_user: dict = Depends(get_current_user),
 ):
 
-    if current_user["role"] != "Admin":
+    if (
+        current_user["role"] != "Admin"
+        and str(current_user["employee_id"]) != employee_id
+    ):
         raise HTTPException(
             status_code=403,
-            detail="Only Admin can view employee details"
+            detail="Access denied",
         )
 
-    employee = (
-        db.query(Employee)
-        .filter(Employee.EmployeeID == employee_id)
-        .first()
-    )
-
-    if not employee:
-        raise HTTPException(
-            status_code=404,
-            detail="Employee not found"
-        )
+    employee = get_employee_by_id(db, employee_id)
 
     return {
         "EmployeeID": str(employee.EmployeeID),
@@ -252,9 +310,10 @@ def get_employee(
     }
 
 
-# ==========================
+# =====================================================
 # Delete Employee
-# ==========================
+# =====================================================
+
 @router.delete("/{employee_id}")
 def delete_employee(
     employee_id: str,
@@ -265,24 +324,20 @@ def delete_employee(
     if current_user["role"] != "Admin":
         raise HTTPException(
             status_code=403,
-            detail="Only Admin can delete employees"
+            detail="Only Admin can delete employees",
         )
 
-    employee = (
-        db.query(Employee)
-        .filter(Employee.EmployeeID == employee_id)
-        .first()
-    )
+    employee = get_employee_by_id(db, employee_id)
 
-    if not employee:
-        raise HTTPException(
-            status_code=404,
-            detail="Employee not found"
-        )
+    if employee.PhotoURL:
+        photo_path = employee.PhotoURL.replace("/", os.sep).lstrip(os.sep)
+
+        if os.path.exists(photo_path):
+            os.remove(photo_path)
 
     db.delete(employee)
     db.commit()
 
     return {
-        "message": "Employee deleted successfully"
+        "message": "Employee deleted successfully",
     }

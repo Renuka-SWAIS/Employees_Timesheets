@@ -17,7 +17,6 @@ router = APIRouter(
     tags=["Authentication"],
 )
 
-# Replace this with your Google OAuth Client ID later
 GOOGLE_CLIENT_ID = "1020497458196-ul4vg6cdmln2cs3utf1uqf56a67dbr5v.apps.googleusercontent.com"
 
 
@@ -56,6 +55,13 @@ def google_login(
             status_code=403,
             detail="Employee not authorized",
         )
+
+    print("========== LOGIN ==========")
+    print("EmployeeID :", employee.EmployeeID)
+    print("EmployeeName :", employee.EmployeeName)
+    print("Email :", employee.EmailID)
+    print("Role :", employee.RoleType)
+    print("===========================")
 
     token = create_access_token(
         {

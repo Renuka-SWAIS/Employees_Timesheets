@@ -13,15 +13,16 @@ from app.routers import example, employees, timesheet, auth
 import os   # <-- NEW
 
 app = FastAPI(title=settings.app_name)
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=[
+        "http://localhost:2005",
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # -------------------------
 # Create uploads folder
 # -------------------------
