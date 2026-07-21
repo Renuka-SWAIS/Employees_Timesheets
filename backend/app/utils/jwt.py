@@ -1,33 +1,33 @@
-from datetime import datetime, timedelta
-from jose import jwt
+from datetime import datetime, timedelta, timezone
 
-# Later we'll move these to .env
-SECRET_KEY = "CHANGE_THIS_SECRET_KEY_BEFORE_PRODUCTION"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 480   # 8 Hours
+from jose import JWTError, jwt
+
+from app.config import settings
 
 
-def create_access_token(data: dict):
+def create_access_token(data: dict) -> str:
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(
-        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+    expire = datetime.now(timezone.utc) + timedelta(
+        minutes=settings.access_token_expire_minutes
     )
 
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(
+    return jwt.encode(
         to_encode,
-        SECRET_KEY,
-        algorithm=ALGORITHM
+        settings.jwt_secret_key,
+        algorithm=settings.jwt_algorithm,
     )
 
-    return encoded_jwt
 
-
-def verify_token(token: str):
-    return jwt.decode(
-        token,
-        SECRET_KEY,
-        algorithms=[ALGORITHM]
-    )
+def verify_token(token: str) -> dict:
+    try:
+        return jwt.decode(
+            token,
+            settings.jwt_secret_key,
+            algorithms=[settings.jwt_algorithm],
+        )
+        
+    except JWTError as error:
+        raise ValueError("Invalid or expired token") from error

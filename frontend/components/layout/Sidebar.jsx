@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const menuItems = [
   {
@@ -29,6 +29,15 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    router.replace("/login");
+    router.refresh();
+  };
 
   return (
     <aside className="sidebar">
@@ -52,7 +61,11 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      <button className="logout-btn">
+      <button
+        type="button"
+        className="logout"
+        onClick={handleLogout}
+      >
         Logout
       </button>
     </aside>

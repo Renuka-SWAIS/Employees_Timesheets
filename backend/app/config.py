@@ -30,6 +30,27 @@ class Settings:
             for origin in os.getenv("CORS_ORIGINS", "").split(",")
             if origin.strip()
         ]
+         # Google OAuth
+        self.google_client_id = self._require(
+            "GOOGLE_CLIENT_ID"
+        )
+
+        # JWT
+        self.jwt_secret_key = self._require(
+            "JWT_SECRET_KEY"
+        )
+
+        self.jwt_algorithm = os.getenv(
+            "JWT_ALGORITHM",
+            "HS256"
+        )
+
+        self.access_token_expire_minutes = int(
+            os.getenv(
+                "ACCESS_TOKEN_EXPIRE_MINUTES",
+                "480"
+            )
+        )
 
     @staticmethod
     def _require(name: str) -> str:

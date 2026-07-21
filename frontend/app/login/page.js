@@ -2,31 +2,30 @@
 
 import { GoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function LoginPage() {
   const router = useRouter();
 
   const handleSuccess = async (credentialResponse) => {
     try {
-      console.log("Google Credential:", credentialResponse);
 
-      const response = await fetch(`${API_URL}/auth/google`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          credential: credentialResponse.credential,
-        }),
-      });
+      const response = await fetch(apiUrl("/auth/google"), {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    credential: credentialResponse.credential,
+  }),
+});
+      
 
       console.log("Response Status:", response.status);
 
       const data = await response.json();
 
-      console.log("Backend Response:", data);
 
       if (!response.ok) {
         alert(data.detail || "Login Failed");
@@ -45,7 +44,6 @@ export default function LoginPage() {
       // Save Token
       localStorage.setItem("token", token);
 
-      console.log("Saved Token:", localStorage.getItem("token"));
 
       // Save User
       if (data.user) {

@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from google.oauth2 import id_token
 from google.auth.transport import requests
+from google.oauth2 import id_token
+from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.database.database import get_db
 from app.models.employee import Employee
 from app.schemas.auth import (
@@ -12,12 +13,11 @@ from app.schemas.auth import (
 )
 from app.utils.jwt import create_access_token
 
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
-
-GOOGLE_CLIENT_ID = "1020497458196-ul4vg6cdmln2cs3utf1uqf56a67dbr5v.apps.googleusercontent.com"
 
 
 @router.post("/google", response_model=LoginResponse)
@@ -29,13 +29,23 @@ def google_login(
         idinfo = id_token.verify_oauth2_token(
             request.credential,
             requests.Request(),
-            GOOGLE_CLIENT_ID,
+            settings.google_client_id,
         )
 
-        email = idinfo["email"]
-        print("Google Email:", email)
+        email = idinfo.get("email")
 
-    except Exception:
+        if not email:
+            raise HTTPException(
+                status_code=401,
+                detail="Google account email not found",
+            )
+
+    except HTTPException:
+        raise
+
+    except Exception as error:
+        print("Google token verification failed:", str(error))
+
         raise HTTPException(
             status_code=401,
             detail="Invalid Google Token",
@@ -55,13 +65,6 @@ def google_login(
             status_code=403,
             detail="Employee not authorized",
         )
-
-    print("========== LOGIN ==========")
-    print("EmployeeID :", employee.EmployeeID)
-    print("EmployeeName :", employee.EmployeeName)
-    print("Email :", employee.EmailID)
-    print("Role :", employee.RoleType)
-    print("===========================")
 
     token = create_access_token(
         {

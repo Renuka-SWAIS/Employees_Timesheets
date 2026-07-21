@@ -1,28 +1,58 @@
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_BASE_URL || ""
+).trim().replace(/\/+$/, "");
 
 export async function apiRequest(endpoint, options = {}) {
-  const token = localStorage.getItem("token");
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("token")
+      : null;
 
-  console.log("JWT Token:", token);
+  const response = await fetch(
+    `${API_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`,
+    {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {}),
+        ...(options.headers || {}),
+      },
+    }
+  );
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
+  if (response.status === 401) {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
-      ...(token
-        ? {
-            Authorization: `Bearer ${token}`,
-          }
-        : {}),
+      const basePath =
+        process.env.NODE_ENV === "production"
+          ? "/employee-timesheet"
+          : "";
 
-      ...options.headers,
-    },
-  });
+      window.location.href = `${basePath}/login`;
+    }
+
+    throw new Error("Session expired. Please log in again.");
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error || "API Request Failed");
+    const errorText = await response.text();
+
+    let message = "API request failed";
+
+    try {
+      const errorData = JSON.parse(errorText);
+      message = errorData.detail || errorData.message || message;
+    } catch {
+      message = errorText || message;
+    }
+
+    throw new Error(message);
   }
 
   if (response.status === 204) {

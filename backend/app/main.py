@@ -3,35 +3,33 @@
 Module path is always `app.main:app` — pm2/uvicorn/Nginx all assume this.
 """
 
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles   # <-- NEW
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
-from app.routers import example, employees, timesheet, auth
+from app.routers import auth, employees, example, timesheet
 
-import os   # <-- NEW
 
 app = FastAPI(title=settings.app_name)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:2005",
-        "http://localhost:3000",
-    ],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# -------------------------
-# Create uploads folder
-# -------------------------
+
 os.makedirs("uploads", exist_ok=True)
 
-# -------------------------
-# Serve uploaded images
-# -------------------------
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount(
+    "/uploads",
+    StaticFiles(directory="uploads"),
+    name="uploads",
+)
 
 
 @app.get("/health")
@@ -42,7 +40,6 @@ def health():
     }
 
 
-# Routes
 app.include_router(example.router)
 app.include_router(employees.router)
 app.include_router(timesheet.router)
