@@ -122,20 +122,43 @@ export default function EmployeeTimesheetsPage() {
 
       {/* Back Button */}
 
-      <button
-        onClick={() => router.push("/employees")}
-        style={{
-          background: "#2563eb",
-          color: "#fff",
-          border: "none",
-          padding: "10px 18px",
-          borderRadius: "8px",
-          cursor: "pointer",
-          marginBottom: "20px",
-        }}
-      >
-        ← Back to Employees
-      </button>
+      <div
+  style={{
+    display: "flex",
+    gap: "12px",
+    marginBottom: "20px",
+  }}
+>
+  <button
+    onClick={() => router.push("/employees")}
+    style={{
+      background: "#2563eb",
+      color: "#fff",
+      border: "none",
+      padding: "10px 18px",
+      borderRadius: "8px",
+      cursor: "pointer",
+    }}
+  >
+    ← Back to Employees
+  </button>
+
+  <button
+    onClick={() =>
+      router.push(`/employees/${employeeId}/leaves`)
+    }
+    style={{
+      background: "#16a34a",
+      color: "#fff",
+      border: "none",
+      padding: "10px 18px",
+      borderRadius: "8px",
+      cursor: "pointer",
+    }}
+  >
+    🍃 View Leaves
+  </button>
+</div>
 
       {/* Page Title */}
 

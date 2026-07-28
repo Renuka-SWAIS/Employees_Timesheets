@@ -100,14 +100,12 @@ def create_timesheet(
     current_user: dict = Depends(get_current_user),
 ):
 
-    if current_user["role"] == "Admin":
-        employee_id = timesheet.EmployeeID
-    else:
-        employee_id = current_user["employee_id"]
+    employee_id = current_user["employee_id"]
 
     new_entry = Timesheet(
         EntryID=uuid4(),
         EmployeeID=employee_id,
+        TaskID=timesheet.TaskID,
         WorkDate=timesheet.WorkDate,
         Month=timesheet.WorkDate.month,
         Year=timesheet.WorkDate.year,

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Float, Date, TIMESTAMP
+from sqlalchemy import Column, String, Integer, Float, Date, TIMESTAMP ,ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
@@ -11,6 +11,13 @@ class Timesheet(Base):
     EntryID = Column("entryid", UUID(as_uuid=True), primary_key=True)
 
     EmployeeID = Column("employeeid", UUID(as_uuid=True), nullable=False)
+
+    TaskID = Column(
+    "taskid",
+    UUID(as_uuid=True),
+    ForeignKey("task_master.taskid"),
+    nullable=True,)
+                   
 
     WorkDate = Column("workdate", Date, nullable=False)
 

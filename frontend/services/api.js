@@ -8,6 +8,9 @@ export async function apiRequest(endpoint, options = {}) {
       ? localStorage.getItem("token")
       : null;
 
+      console.log("TOKEN =", token);
+      console.log("TOKEN LENGTH =", token?.length);
+
   const response = await fetch(
     `${API_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`,
     {

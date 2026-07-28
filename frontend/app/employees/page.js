@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import MainLayout from "../../components/layout/MainLayout";
 import EmployeeToolbar from "../../components/employees/EmployeeToolbar";
@@ -11,6 +12,20 @@ import EmployeeForm from "../../components/employees/EmployeeForm";
 import useEmployee from "../../hooks/useEmployee";
 
 export default function EmployeesPage() {
+  const router = useRouter();
+
+  const [authorized, setAuthorized] = useState(null);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (user?.RoleType === "Admin") {
+      setAuthorized(true);
+    } else {
+      setAuthorized(false);
+    }
+  }, []);
+
   const {
     employees,
     loading,
@@ -70,6 +85,64 @@ export default function EmployeesPage() {
       );
     });
   }, [employees, search, department, role, status]);
+
+  if (authorized === null) {
+    return null;
+  }
+
+  if (!authorized) {
+    return (
+      <MainLayout>
+        <div
+          style={{
+            maxWidth: "700px",
+            margin: "100px auto",
+            background: "#fff",
+            padding: "40px",
+            borderRadius: "12px",
+            textAlign: "center",
+            boxShadow: "0 6px 20px rgba(0,0,0,.08)",
+          }}
+        >
+          <h1
+            style={{
+              color: "#dc2626",
+              marginBottom: "15px",
+            }}
+          >
+            🔒 Access Denied
+          </h1>
+
+          <p
+            style={{
+              fontSize: "17px",
+              color: "#555",
+              marginBottom: "30px",
+            }}
+          >
+            You do not have permission to access Employee Management.
+            <br />
+            Only administrators can view and manage employees.
+          </p>
+
+          <button
+            onClick={() => router.push("/dashboard")}
+            style={{
+              background: "#2563eb",
+              color: "#fff",
+              border: "none",
+              padding: "12px 22px",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            ← Back to Dashboard
+          </button>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -135,27 +208,27 @@ export default function EmployeesPage() {
         onRefresh={loadEmployees}
       />
 
-     <EmployeeTable
-  employees={filteredEmployees}
-  loading={loading}
-  onViewEmployee={setSelectedEmployee}
-  onEditEmployee={(employee) => {
-    setEditingEmployee(employee);
-    setShowForm(true);
-  }}
-  onDeleteEmployee={async (employeeId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this employee?"
-    );
+      <EmployeeTable
+        employees={filteredEmployees}
+        loading={loading}
+        onViewEmployee={setSelectedEmployee}
+        onEditEmployee={(employee) => {
+          setEditingEmployee(employee);
+          setShowForm(true);
+        }}
+        onDeleteEmployee={async (employeeId) => {
+          const confirmDelete = window.confirm(
+            "Are you sure you want to delete this employee?"
+          );
 
-    if (!confirmDelete) return;
+          if (!confirmDelete) return;
 
-    await removeEmployee(employeeId);
-  }}
-  onViewTimesheets={(employee) => {
-    window.location.href = `/employees/${employee.EmployeeID}/timesheets`;
-  }}
-/>
+          await removeEmployee(employeeId);
+        }}
+        onViewTimesheets={(employee) => {
+          router.push(`/employees/${employee.EmployeeID}/timesheets`);
+        }}
+      />
 
       <EmployeeModal
         employee={selectedEmployee}

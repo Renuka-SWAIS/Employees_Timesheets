@@ -1,6 +1,6 @@
 """SWAIS standard FastAPI entry point.
 
-Module path is always `app.main:app` — pm2/uvicorn/Nginx all assume this.
+Module path is always `app.main:app`
 """
 
 import os
@@ -10,10 +10,29 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
-from app.routers import auth, employees, example, timesheet
 
+# Database
+from app.database.database import Base, engine
+
+# Import all models
+from app.models.employee import Employee
+from app.models.timesheet import Timesheet
+from app.models.leave import Leave
+from app.models.task import Task
+
+from app.routers import (
+    auth,
+    employees,
+    example,
+    timesheet,
+    leave,
+    task,
+)
 
 app = FastAPI(title=settings.app_name)
+
+# Create database tables automatically
+Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,4 +62,6 @@ def health():
 app.include_router(example.router)
 app.include_router(employees.router)
 app.include_router(timesheet.router)
+app.include_router(leave.router)
 app.include_router(auth.router)
+app.include_router(task.router)

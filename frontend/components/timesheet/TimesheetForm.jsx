@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getTasks } from "../../services/task";
 
 const initialState = {
   WorkDate: "",
   Month: new Date().getMonth() + 1,
   Year: new Date().getFullYear(),
+
+  TaskID: "",
+
   Project: "",
   TaskDescription: "",
   HoursWorked: "",
@@ -19,6 +23,9 @@ export default function TimesheetForm({
   editData,
 }) {
   const [form, setForm] = useState(initialState);
+  const [tasks, setTasks] = useState([]);
+
+  const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     if (editData) {
@@ -33,169 +40,380 @@ export default function TimesheetForm({
     }
   }, [editData]);
 
-  if (!open) return null;
+  
 
   function handleChange(e) {
     const { name, value } = e.target;
 
     setForm((prev) => ({
       ...prev,
-      [name]:
-        name === "HoursWorked"
-          ? Number(value)
-          : value,
+      [name]: value,
     }));
   }
+
+  useEffect(() => {
+
+  async function loadTasks() {
+
+    try {
+
+      const data = await getTasks();
+
+      setTasks(data);
+
+    } catch (err) {
+
+      console.error(err);
+
+    }
+
+  }
+
+  loadTasks();
+
+}, []);
+
+
+useEffect(() => {
+
+  const task = tasks.find(
+    (t) => t.TaskID === form.TaskID
+  );
+
+  setSelectedTask(task || null);
+
+}, [form.TaskID, tasks]);
+  // =============================
+  // Hours Validation
+  // Valid Examples:
+  // 1
+  // 1.25
+  // 1.59
+  // 0.50
+  // Invalid:
+  // 1.60
+  // 2.75
+  // =============================
+  if (!open) return null;
+  function validateHours(hours) {
+
+  if (!hours) return false;
+
+  const text = hours.toString().trim();
+
+  // Allow:
+  // 1
+  // 0.25
+  // 0.50
+  // 1.59
+
+  if (!/^\d+(\.\d{2})?$/.test(text)) {
+    return false;
+  }
+
+  const parts = text.split(".");
+
+  const hrs = Number(parts[0]);
+
+  if (hrs > 24) {
+    return false;
+  }
+
+  if (parts.length === 2) {
+
+    const mins = Number(parts[1]);
+
+    if (mins < 0 || mins > 59) {
+      return false;
+    }
+
+  }
+
+  return true;
+}
 
   function handleSubmit(e) {
     e.preventDefault();
 
     if (!form.WorkDate) {
-      alert("Work Date is required");
+      alert("Date is required.");
       return;
     }
 
-    if (!form.Project.trim()) {
-      alert("Project is required");
-      return;
+    if (!form.TaskID) {
+       alert("Please select a task.");
+       return;
     }
 
     if (!form.TaskDescription.trim()) {
-      alert("Task Description is required");
+      alert("Task Details are required.");
       return;
     }
 
     if (form.TaskDescription.trim().length < 10) {
-      alert("Task Description must be at least 10 characters.");
+      alert(
+        "Task Details must be at least 10 characters."
+      );
       return;
     }
 
-    if (
-      Number(form.HoursWorked) < 0.5 ||
-      Number(form.HoursWorked) > 24
-    ) {
-      alert("Hours Worked must be between 0.5 and 24.");
+    if (!validateHours(form.HoursWorked)) {
+      alert(
+        "Invalid Hours.\n\nExamples:\n1\n1.25\n1.59\n0.50\n\nMinutes cannot be greater than 59."
+      );
       return;
     }
 
     const payload = {
-      WorkDate: form.WorkDate,
-      Month: new Date(form.WorkDate).getMonth() + 1,
-      Year: new Date(form.WorkDate).getFullYear(),
-      Project: form.Project,
-      TaskDescription: form.TaskDescription,
-      HoursWorked: Number(form.HoursWorked),
-      Remarks: form.Remarks,
-    };
+  WorkDate: form.WorkDate,
+  Month: new Date(form.WorkDate).getMonth() + 1,
+  Year: new Date(form.WorkDate).getFullYear(),
+
+  TaskID: form.TaskID,
+
+  Project: selectedTask?.TaskName || "",
+  TaskDescription: form.TaskDescription,
+  HoursWorked: Number(form.HoursWorked),
+  Remarks: form.Remarks,
+};
 
     onSave(payload);
   }
 
-  return (
+return (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,.45)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 999,
+    }}
+  >
     <div
       style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,.45)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 999,
+        width: "600px",
+        background: "#fff",
+        borderRadius: "12px",
+        padding: "30px",
       }}
     >
-      <div
-        style={{
-          width: "600px",
-          background: "#fff",
-          borderRadius: "12px",
-          padding: "30px",
-        }}
-      >
-        <h2 style={{ marginBottom: "20px" }}>
-          {editData ? "Edit Timesheet" : "Add Timesheet"}
-        </h2>
+      <h2 style={{ marginBottom: "20px" }}>
+        {editData ? "Edit Timesheet" : "Add Timesheet"}
+      </h2>
 
-        <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
 
-          <input
-            type="date"
-            name="WorkDate"
-            value={form.WorkDate}
-            onChange={handleChange}
-            style={inputStyle}
-            required
-          />
+        {/* Date */}
+        <label
+          style={{
+            fontWeight: "600",
+            display: "block",
+            marginBottom: "6px",
+          }}
+        >
+          Date
+        </label>
 
-          <input
-            type="text"
-            name="Project"
-            placeholder="Project Name"
-            value={form.Project}
-            onChange={handleChange}
-            style={inputStyle}
-            required
-          />
+        <input
+          type="date"
+          name="WorkDate"
+          value={form.WorkDate}
+          onChange={handleChange}
+          style={inputStyle}
+          required
+        />
 
-          <textarea
-            name="TaskDescription"
-            placeholder="Task Description"
-            value={form.TaskDescription}
-            onChange={handleChange}
-            rows={4}
-            style={inputStyle}
-            required
-          />
+        {/* Task */}
+        {/* Task */}
 
-          <input
-            type="number"
-            name="HoursWorked"
-            placeholder="Hours Worked"
-            value={form.HoursWorked}
-            onChange={handleChange}
-            step="0.5"
-            min="0.5"
-            max="24"
-            style={inputStyle}
-            required
-          />
+{/* Task */}
+{/* Task */}
 
-          <textarea
-            name="Remarks"
-            placeholder="Remarks"
-            value={form.Remarks}
-            onChange={handleChange}
-            rows={3}
-            style={inputStyle}
-          />
+<label
+  style={{
+    fontWeight: "600",
+    display: "block",
+    marginBottom: "6px",
+  }}
+>
+  Task
+</label>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "10px",
-              marginTop: "20px",
-            }}
-          >
-            <button
-              type="button"
-              onClick={onClose}
-              style={cancelBtn}
-            >
-              Cancel
-            </button>
+<select
+  name="TaskID"
+  value={form.TaskID}
+  onChange={(e) => {
+    const task = tasks.find(
+      (t) => t.TaskID === e.target.value
+    );
 
-            <button
-              type="submit"
-              style={saveBtn}
-            >
-              {editData ? "Update" : "Save"}
-            </button>
-          </div>
+    setForm((prev) => ({
+      ...prev,
+      TaskID: e.target.value,
+      Project: task ? task.TaskName : "",
+    }));
+  }}
+  style={inputStyle}
+  required
+>
+  <option value="">Select Task</option>
 
-        </form>
-      </div>
+  {tasks.map((task) => (
+    <option
+      key={task.TaskID}
+      value={task.TaskID}
+    >
+      {task.TaskCode} - {task.TaskName}
+    </option>
+  ))}
+</select>
+  
+
+{selectedTask && (
+  <div
+    style={{
+      background: "#f8fafc",
+      border: "1px solid #dbeafe",
+      borderRadius: "8px",
+      padding: "15px",
+      marginBottom: "18px",
+    }}
+  >
+    <div>
+      <b>Approved Hours :</b> {selectedTask.ApprovedHours}
     </div>
-  );
+
+    <div>
+      <b>Hours Spent :</b> {selectedTask.HoursSpent}
+    </div>
+
+    <div>
+      <b>Remaining Hours :</b> {selectedTask.RemainingHours}
+    </div>
+  </div>
+)}
+
+        {/* Task Details */}
+        <label
+          style={{
+            fontWeight: "600",
+            display: "block",
+            marginBottom: "6px",
+          }}
+        >
+          Task Details
+        </label>
+
+        <textarea
+          rows={4}
+          name="TaskDescription"
+          value={form.TaskDescription}
+          onChange={handleChange}
+          placeholder="Enter Task Details"
+          style={inputStyle}
+          required
+        />
+
+        {/* Hours */}
+        <label
+          style={{
+            fontWeight: "600",
+            display: "block",
+            marginBottom: "6px",
+          }}
+        >
+          Hours
+        </label>
+
+        <input
+  type="text"
+  inputMode="decimal"
+  pattern="^\d+(\.\d{0,2})?$"
+  name="HoursWorked"
+  value={form.HoursWorked}
+  onChange={handleChange}
+  placeholder="Examples: 1, 0.25, 0.50, 1.59"
+  style={inputStyle}
+  required
+/>
+
+            <div
+  style={{
+    marginTop: "-8px",
+    marginBottom: "15px",
+    fontSize: "12px",
+    color: "#6b7280",
+    lineHeight: "18px",
+  }}
+>
+  Examples:
+  <br />
+  • 1 = 1 Hour
+  <br />
+  • 0.25 = 25 Minutes
+  <br />
+  • 0.50 = 50 Minutes
+  <br />
+  • 1.25 = 1 Hour 25 Minutes
+  <br />
+  • 1.59 = 1 Hour 59 Minutes
+  <br />
+  <span style={{ color: "#dc2626", fontWeight: 600 }}>
+    Minutes must be between 00 and 59 only.
+  </span>
+</div>
+
+        {/* Remarks */}
+        <label
+          style={{
+            fontWeight: "600",
+            display: "block",
+            marginBottom: "6px",
+          }}
+        >
+          Remarks
+        </label>
+
+        <textarea
+          rows={3}
+          name="Remarks"
+          value={form.Remarks}
+          onChange={handleChange}
+          placeholder="Enter Remarks"
+          style={inputStyle}
+        />
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "10px",
+            marginTop: "20px",
+          }}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            style={cancelBtn}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            style={saveBtn}
+          >
+            {editData ? "Update" : "Save"}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+);
 }
 
 const inputStyle = {

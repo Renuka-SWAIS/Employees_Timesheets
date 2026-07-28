@@ -12,6 +12,7 @@ class TimesheetCreate(BaseModel):
     WorkDate: date
     Month: int
     Year: int
+    TaskID: UUID
     Project: str
     TaskDescription: str
     HoursWorked: float
@@ -26,6 +27,7 @@ class TimesheetUpdate(BaseModel):
     WorkDate: Optional[date] = None
     Month: Optional[int] = None
     Year: Optional[int] = None
+    TaskID: Optional[UUID] = None
     Project: Optional[str] = None
     TaskDescription: Optional[str] = None
     HoursWorked: Optional[float] = None
@@ -41,6 +43,7 @@ class TimesheetResponse(BaseModel):
     WorkDate: date
     Month: int
     Year: int
+    TaskID: UUID
     Project: str
     TaskDescription: str
     HoursWorked: float
