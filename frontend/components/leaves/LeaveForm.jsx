@@ -30,7 +30,7 @@ export default function LeaveForm({
         ToDate: editData.ToDate
           ? editData.ToDate.split("T")[0]
           : "",
-        LeaveType: editData.LeaveType,
+        LeaveType: editData.LeaveType || "Casual Leave",
         Reason: editData.Reason || "",
       });
     } else {
@@ -96,25 +96,48 @@ export default function LeaveForm({
         justifyContent: "center",
         alignItems: "center",
         zIndex: 999,
+        padding: "20px",
+        boxSizing: "border-box",
+        overflowY: "auto",
       }}
     >
       <div
         style={{
           width: "600px",
+          maxWidth: "100%",
+          maxHeight: "calc(100vh - 40px)",
           background: "#fff",
           borderRadius: "12px",
           padding: "30px",
+          boxSizing: "border-box",
+          overflowY: "auto",
         }}
       >
-        <h2 style={{ marginBottom: "20px" }}>
+        <h2
+          style={{
+            marginBottom: "20px",
+          }}
+        >
           {editData ? "Edit Leave" : "Apply Leave"}
         </h2>
 
         <form onSubmit={handleSubmit}>
 
+          {/* ============================= */}
+          {/* Employee - Admin Only */}
+          {/* ============================= */}
+
           {isAdmin && (
             <>
-              <label>Employee</label>
+              <label
+                style={{
+                  fontWeight: "600",
+                  display: "block",
+                  marginBottom: "6px",
+                }}
+              >
+                Employee
+              </label>
 
               <select
                 name="EmployeeID"
@@ -139,7 +162,19 @@ export default function LeaveForm({
             </>
           )}
 
-          <label>From Date</label>
+          {/* ============================= */}
+          {/* From Date */}
+          {/* ============================= */}
+
+          <label
+            style={{
+              fontWeight: "600",
+              display: "block",
+              marginBottom: "6px",
+            }}
+          >
+            From Date
+          </label>
 
           <input
             type="date"
@@ -150,7 +185,19 @@ export default function LeaveForm({
             required
           />
 
-          <label>To Date</label>
+          {/* ============================= */}
+          {/* To Date */}
+          {/* ============================= */}
+
+          <label
+            style={{
+              fontWeight: "600",
+              display: "block",
+              marginBottom: "6px",
+            }}
+          >
+            To Date
+          </label>
 
           <input
             type="date"
@@ -161,7 +208,19 @@ export default function LeaveForm({
             required
           />
 
-          <label>Leave Type</label>
+          {/* ============================= */}
+          {/* Leave Type */}
+          {/* ============================= */}
+
+          <label
+            style={{
+              fontWeight: "600",
+              display: "block",
+              marginBottom: "6px",
+            }}
+          >
+            Leave Type
+          </label>
 
           <select
             name="LeaveType"
@@ -177,22 +236,43 @@ export default function LeaveForm({
             <option>Other</option>
           </select>
 
-          <label>Reason</label>
+          {/* ============================= */}
+          {/* Reason */}
+          {/* ============================= */}
+
+          <label
+            style={{
+              fontWeight: "600",
+              display: "block",
+              marginBottom: "6px",
+            }}
+          >
+            Reason
+          </label>
 
           <textarea
             rows={4}
             name="Reason"
             value={form.Reason}
             onChange={handleChange}
+            placeholder="Enter reason for leave"
             style={inputStyle}
             required
           />
-                    <div
+
+          {/* ============================= */}
+          {/* Buttons */}
+          {/* ============================= */}
+
+          <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
               gap: "10px",
               marginTop: "20px",
+              paddingTop: "15px",
+              borderTop: "1px solid #e5e7eb",
+              background: "#fff",
             }}
           >
             <button

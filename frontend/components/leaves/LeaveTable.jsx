@@ -28,70 +28,100 @@ export default function LeaveTable({
         borderRadius: "12px",
         overflow: "hidden",
         boxShadow: "0 2px 8px rgba(0,0,0,.08)",
+        width: "100%",
       }}
     >
-      <table
+      <div
         style={{
           width: "100%",
-          borderCollapse: "collapse",
+          overflowX: "auto",
         }}
       >
-        <thead
+        <table
           style={{
-            background: "#2563eb",
-            color: "#fff",
+            width: "100%",
+            minWidth: "800px",
+            borderCollapse: "collapse",
           }}
         >
-          <tr>
-            <th style={th}>From Date</th>
-            <th style={th}>To Date</th>
-            <th style={th}>Leave Type</th>
-            <th style={th}>Total Days</th>
-            <th style={th}>Reason</th>
-            <th style={th}>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {leaves.length === 0 ? (
+          <thead
+            style={{
+              background: "#2563eb",
+              color: "#fff",
+            }}
+          >
             <tr>
-              <td colSpan={6} style={td}>
-                No Leave Records
-              </td>
+              <th style={th}>From Date</th>
+              <th style={th}>To Date</th>
+              <th style={th}>Leave Type</th>
+              <th style={th}>Total Days</th>
+              <th style={th}>Reason</th>
+              <th style={th}>Actions</th>
             </tr>
-          ) : (
-            leaves.map((leave) => (
-              <tr key={leave.LeaveID}>
-                <td style={td}>{leave.FromDate}</td>
+          </thead>
 
-                <td style={td}>{leave.ToDate}</td>
-
-                <td style={td}>{leave.LeaveType}</td>
-
-                <td style={td}>{leave.TotalDays}</td>
-
-                <td style={td}>{leave.Reason}</td>
-
-                <td style={td}>
-                  <button
-                    onClick={() => onEdit(leave)}
-                    style={editBtn}
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    onClick={() => onDelete(leave)}
-                    style={deleteBtn}
-                  >
-                    Delete
-                  </button>
+          <tbody>
+            {leaves.length === 0 ? (
+              <tr>
+                <td colSpan={6} style={td}>
+                  No Leave Records
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              leaves.map((leave) => (
+                <tr key={leave.LeaveID}>
+                  <td style={td}>
+                    {leave.FromDate}
+                  </td>
+
+                  <td style={td}>
+                    {leave.ToDate}
+                  </td>
+
+                  <td style={td}>
+                    {leave.LeaveType}
+                  </td>
+
+                  <td style={td}>
+                    {leave.TotalDays}
+                  </td>
+
+                  <td
+                    style={{
+                      ...td,
+                      maxWidth: "300px",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {leave.Reason}
+                  </td>
+
+                  <td
+                    style={{
+                      ...td,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <button
+                      onClick={() => onEdit(leave)}
+                      style={editBtn}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => onDelete(leave)}
+                      style={deleteBtn}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -99,6 +129,7 @@ export default function LeaveTable({
 const th = {
   padding: "14px",
   textAlign: "left",
+  whiteSpace: "nowrap",
 };
 
 const td = {
