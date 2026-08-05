@@ -35,11 +35,30 @@ export default function TimesheetPage() {
 
   const [selected, setSelected] = useState(null);
 
+  // ==========================================
+  // Get logged-in user role
+  // ==========================================
+  const user =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user") || "null")
+      : null;
+
+  const role = user?.RoleType;
+
+  const isAdmin = role === "Admin";
+
+  // ==========================================
+  // Filter Timesheets
+  // ==========================================
   const filteredTimesheets = useMemo(() => {
     return timesheets.filter((item) => {
       const matchesSearch =
-        item.Project?.toLowerCase().includes(search.toLowerCase()) ||
-        item.TaskDescription?.toLowerCase().includes(search.toLowerCase());
+        item.Project?.toLowerCase().includes(
+          search.toLowerCase()
+        ) ||
+        item.TaskDescription?.toLowerCase().includes(
+          search.toLowerCase()
+        );
 
       const matchesMonth =
         new Date(item.WorkDate).toLocaleString("default", {
@@ -50,28 +69,70 @@ export default function TimesheetPage() {
     });
   }, [timesheets, search, month]);
 
+  // ==========================================
+  // Check Current Month
+  // ==========================================
+  function isCurrentMonth(workDate) {
+    if (!workDate) return false;
+
+    const date = new Date(workDate);
+    const now = new Date();
+
+    return (
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
+  }
+
+  // ==========================================
+  // Save Timesheet
+  // ==========================================
   async function handleSave(formData) {
     try {
       if (selected) {
-        await editTimesheet(selected.EntryID, formData);
+        // ==========================================
+        // Employee cannot edit past month
+        // Admin can edit past month
+        // ==========================================
+        if (
+          !isAdmin &&
+          !isCurrentMonth(selected.WorkDate)
+        ) {
+          alert(
+            "Past month timesheets cannot be edited."
+          );
+          return;
+        }
+
+        await editTimesheet(
+          selected.EntryID,
+          formData
+        );
       } else {
         await addTimesheet(formData);
       }
 
       setShowForm(false);
       setSelected(null);
+
+      await loadTimesheets();
     } catch (err) {
       console.error(err);
       alert("Unable to save timesheet.");
     }
   }
 
+  // ==========================================
+  // Delete Timesheet
+  // ==========================================
   async function handleDelete() {
     try {
       await removeTimesheet(selected.EntryID);
 
       setShowDelete(false);
       setSelected(null);
+
+      await loadTimesheets();
     } catch (err) {
       console.error(err);
       alert("Unable to delete timesheet.");
@@ -80,7 +141,6 @@ export default function TimesheetPage() {
 
   return (
     <MainLayout>
-
       <h1
         style={{
           marginBottom: "25px",
@@ -104,10 +164,30 @@ export default function TimesheetPage() {
       <TimesheetTable
         loading={loading}
         timesheets={filteredTimesheets}
+
+        // ==========================================
+        // Edit Timesheet
+        // ==========================================
         onEdit={(row) => {
+          // Admin can edit any month
+          if (isAdmin) {
+            setSelected(row);
+            setShowForm(true);
+            return;
+          }
+
+          // Employee can edit only current month
+          if (!isCurrentMonth(row.WorkDate)) {
+            alert(
+              "Past month timesheets cannot be edited."
+            );
+            return;
+          }
+
           setSelected(row);
           setShowForm(true);
         }}
+
         onDelete={(row) => {
           setSelected(row);
           setShowDelete(true);
@@ -132,7 +212,6 @@ export default function TimesheetPage() {
         }}
         onConfirm={handleDelete}
       />
-
     </MainLayout>
   );
 }
