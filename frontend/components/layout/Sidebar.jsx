@@ -89,7 +89,7 @@ export default function Sidebar() {
           <h1>SWAIS</h1>
 
           <span className="sidebar-subtitle">
-            <b>Employee Timesheet</b>
+            <b>SWAIS Employees</b>
           </span>
         </div>
 

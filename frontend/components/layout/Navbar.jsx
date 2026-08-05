@@ -49,13 +49,13 @@ export default function Navbar() {
 
       <div>
 
-        <h2>
-          Employee Timesheet Dashboard
-        </h2>
+      
+          <h1>SWAIS Employees</h1>
+        
 
 
         <p className="navbar-subtitle">
-          Welcome to SWAIS Employee Timesheet Management System
+          <p>Welcome to SWAIS Employees</p>
         </p>
 
       </div>
