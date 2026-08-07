@@ -54,6 +54,13 @@ export default function SettingsPage() {
       return;
     }
 
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Not authenticated. Please login again.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("photo", file);
 
@@ -62,6 +69,9 @@ export default function SettingsPage() {
         `${API_URL}/employees/${profile.EmployeeID}/photo`,
         {
           method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           body: formData,
         }
       );
@@ -69,7 +79,9 @@ export default function SettingsPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.detail || "Photo upload failed");
+        throw new Error(
+          result.detail || "Photo upload failed"
+        );
       }
 
       const updatedUser = {
@@ -103,6 +115,13 @@ export default function SettingsPage() {
       return;
     }
 
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Not authenticated. Please login again.");
+      return;
+    }
+
     try {
       const response = await fetch(
         `${API_URL}/employees/${profile.EmployeeID}`,
@@ -110,6 +129,7 @@ export default function SettingsPage() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(data),
         }
@@ -227,7 +247,9 @@ export default function SettingsPage() {
                 profile.PhotoURL
                   ? `${API_URL}${profile.PhotoURL}?t=${Date.now()}`
                   : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      profile.EmployeeName || profile.Name || "User"
+                      profile.EmployeeName ||
+                        profile.Name ||
+                        "User"
                     )}`
               }
               alt="profile"
@@ -246,7 +268,9 @@ export default function SettingsPage() {
               </h2>
 
               <p>
-                {profile.Designation || profile.Role || "-"}
+                {profile.Designation ||
+                  profile.Role ||
+                  "-"}
               </p>
 
               <span
@@ -288,7 +312,9 @@ export default function SettingsPage() {
                 </td>
 
                 <td>
-                  {profile.EmailID || profile.Email || "-"}
+                  {profile.EmailID ||
+                    profile.Email ||
+                    "-"}
                 </td>
               </tr>
 
@@ -318,7 +344,9 @@ export default function SettingsPage() {
                 </td>
 
                 <td>
-                  {profile.RoleType || profile.Role || "-"}
+                  {profile.RoleType ||
+                    profile.Role ||
+                    "-"}
                 </td>
               </tr>
             </tbody>
@@ -344,7 +372,9 @@ export default function SettingsPage() {
             }}
           >
             <button
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() =>
+                fileInputRef.current?.click()
+              }
               style={{
                 padding: "12px 22px",
                 background: "#2563eb",
