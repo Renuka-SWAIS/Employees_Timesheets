@@ -159,12 +159,12 @@ export default function TimesheetForm({
         overflow: "hidden",
       }}
     >
+      {/* Modal */}
       <div
         style={{
           width: "600px",
           maxWidth: "100%",
-          height: "calc(100vh - 40px)",
-          maxHeight: "800px",
+          maxHeight: "calc(100vh - 40px)",
           background: "#fff",
           borderRadius: "12px",
           boxSizing: "border-box",
@@ -194,17 +194,15 @@ export default function TimesheetForm({
         <div
           style={{
             flex: 1,
+            minHeight: 0,
             overflowY: "auto",
             padding: "10px 30px 20px 30px",
             boxSizing: "border-box",
           }}
         >
           <form id="timesheet-form" onSubmit={handleSubmit}>
-
             {/* Date */}
-            <label style={labelStyle}>
-              Date
-            </label>
+            <label style={labelStyle}>Date</label>
 
             <input
               type="date"
@@ -216,9 +214,7 @@ export default function TimesheetForm({
             />
 
             {/* Task */}
-            <label style={labelStyle}>
-              Task
-            </label>
+            <label style={labelStyle}>Task</label>
 
             <select
               name="TaskID"
@@ -282,9 +278,7 @@ export default function TimesheetForm({
             )}
 
             {/* Task Details */}
-            <label style={labelStyle}>
-              Task Details
-            </label>
+            <label style={labelStyle}>Task Details</label>
 
             <textarea
               rows={4}
@@ -297,14 +291,12 @@ export default function TimesheetForm({
             />
 
             {/* Hours */}
-            <label style={labelStyle}>
-              Hours
-            </label>
+            <label style={labelStyle}>Hours</label>
 
             <input
               type="text"
               inputMode="decimal"
-              pattern="^\d+(\.\d{0,2})?$"
+              pattern="^\\d+(\\.\\d{0,2})?$"
               name="HoursWorked"
               value={form.HoursWorked}
               onChange={handleChange}
@@ -346,9 +338,7 @@ export default function TimesheetForm({
             </div>
 
             {/* Remarks */}
-            <label style={labelStyle}>
-              Remarks
-            </label>
+            <label style={labelStyle}>Remarks</label>
 
             <textarea
               rows={3}
