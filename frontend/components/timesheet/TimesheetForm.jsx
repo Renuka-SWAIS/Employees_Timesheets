@@ -154,7 +154,7 @@ export default function TimesheetForm({
         justifyContent: "center",
         alignItems: "center",
         zIndex: 999,
-        padding: "20px",
+        padding: "12px",
         boxSizing: "border-box",
         overflow: "hidden",
       }}
@@ -164,19 +164,26 @@ export default function TimesheetForm({
         style={{
           width: "600px",
           maxWidth: "100%",
-          maxHeight: "calc(100vh - 40px)",
+
+          /* FIX: Give the modal a fixed viewport-based height */
+          height: "calc(100vh - 24px)",
+          maxHeight: "calc(100vh - 24px)",
+
           background: "#fff",
           borderRadius: "12px",
           boxSizing: "border-box",
+
           display: "flex",
           flexDirection: "column",
+
+          /* Prevent the whole modal from overflowing */
           overflow: "hidden",
         }}
       >
         {/* Header */}
         <div
           style={{
-            padding: "25px 30px 15px 30px",
+            padding: "20px 30px 12px 30px",
             flexShrink: 0,
             background: "#fff",
           }}
@@ -195,9 +202,14 @@ export default function TimesheetForm({
           style={{
             flex: 1,
             minHeight: 0,
+
+            /* FIX: Only this section scrolls */
             overflowY: "auto",
+
             padding: "10px 30px 20px 30px",
             boxSizing: "border-box",
+
+            WebkitOverflowScrolling: "touch",
           }}
         >
           <form id="timesheet-form" onSubmit={handleSubmit}>
@@ -348,6 +360,9 @@ export default function TimesheetForm({
               placeholder="Enter Remarks"
               style={inputStyle}
             />
+
+            {/* Bottom spacing */}
+            <div style={{ height: "10px" }} />
           </form>
         </div>
 
@@ -358,10 +373,17 @@ export default function TimesheetForm({
             justifyContent: "flex-end",
             alignItems: "center",
             gap: "10px",
-            padding: "15px 30px",
+
+            /* Reduced footer height */
+            padding: "10px 30px",
+
             borderTop: "1px solid #e5e7eb",
             background: "#fff",
+
+            /* FIX: Footer never gets pushed away */
             flexShrink: 0,
+            minHeight: "61px",
+            boxSizing: "border-box",
           }}
         >
           <button
