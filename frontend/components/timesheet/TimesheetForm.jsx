@@ -47,18 +47,6 @@ export default function TimesheetForm({
   }, [editData]);
 
   /* --------------------------------
-     HANDLE INPUT CHANGE
-  -------------------------------- */
-  function handleChange(e) {
-    const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
-  /* --------------------------------
      LOAD TASKS
   -------------------------------- */
   useEffect(() => {
@@ -85,7 +73,40 @@ export default function TimesheetForm({
     setSelectedTask(task || null);
   }, [form.TaskID, tasks]);
 
+  /* --------------------------------
+     LOCK BACKGROUND SCROLL
+  -------------------------------- */
+  useEffect(() => {
+    if (!open) return;
+
+    const originalOverflow = document.body.style.overflow;
+    const originalPosition = document.body.style.position;
+    const originalWidth = document.body.style.width;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.position = originalPosition;
+      document.body.style.width = originalWidth;
+    };
+  }, [open]);
+
   if (!open) return null;
+
+  /* --------------------------------
+     HANDLE CHANGE
+  -------------------------------- */
+  function handleChange(e) {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
 
   /* --------------------------------
      HOURS VALIDATION
@@ -95,14 +116,6 @@ export default function TimesheetForm({
 
     const text = hours.toString().trim();
 
-    /*
-      Allowed:
-      1
-      1.25
-      1.50
-      1.59
-      0.50
-    */
     if (!/^\d+(\.\d{2})?$/.test(text)) {
       return false;
     }
@@ -110,7 +123,6 @@ export default function TimesheetForm({
     const parts = text.split(".");
     const hrs = Number(parts[0]);
 
-    // Maximum 24 hours
     if (hrs > 24) {
       return false;
     }
@@ -118,7 +130,6 @@ export default function TimesheetForm({
     if (parts.length === 2) {
       const mins = Number(parts[1]);
 
-      // Minutes must be 00-59
       if (mins < 0 || mins > 59) {
         return false;
       }
@@ -168,9 +179,7 @@ export default function TimesheetForm({
 
     const payload = {
       WorkDate: form.WorkDate,
-
       Month: new Date(form.WorkDate).getMonth() + 1,
-
       Year: new Date(form.WorkDate).getFullYear(),
 
       TaskID: form.TaskID,
@@ -188,428 +197,411 @@ export default function TimesheetForm({
   }
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-
-        background: "rgba(0,0,0,0.45)",
-
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-
-        zIndex: 9999,
-
-        /*
-          Keep a little space around the modal.
-        */
-        padding: "12px",
-
-        boxSizing: "border-box",
-
-        /*
-          IMPORTANT:
-          Background overlay itself must not scroll.
-        */
-        overflow: "hidden",
-      }}
-    >
-      {/* =====================================
-          MODAL
-      ====================================== */}
+    <>
+      {/* =========================================
+          FULL SCREEN OVERLAY
+          BACKGROUND CANNOT SCROLL
+      ========================================= */}
       <div
         style={{
-          position: "relative",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
 
-          width: "600px",
-          maxWidth: "100%",
+          width: "100%",
+          height: "100dvh",
 
-          /*
-            IMPORTANT:
-            The modal height is limited to the
-            visible browser viewport.
+          background: "rgba(0,0,0,0.45)",
 
-            100dvh works better with browser
-            zoom / dynamic viewport changes.
-          */
-          height: "calc(100dvh - 24px)",
-          maxHeight: "calc(100dvh - 24px)",
+          zIndex: 99999,
 
-          minHeight: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
 
-          background: "#ffffff",
-
-          borderRadius: "12px",
+          padding: "12px",
 
           boxSizing: "border-box",
 
-          /*
-            IMPORTANT:
-            Modal itself NEVER scrolls.
-          */
           overflow: "hidden",
 
-          display: "flex",
-          flexDirection: "column",
-
-          boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
+          overscrollBehavior: "none",
         }}
       >
-        {/* =====================================
-            HEADER
-            ALWAYS VISIBLE
-        ====================================== */}
+        {/* =========================================
+            MODAL
+        ========================================= */}
         <div
           style={{
-            flex: "0 0 auto",
+            position: "relative",
 
-            padding: "18px 30px 12px 30px",
+            width: "600px",
+            maxWidth: "100%",
 
-            background: "#ffffff",
-
-            borderBottom: "1px solid #f1f5f9",
-
-            boxSizing: "border-box",
-
-            zIndex: 2,
-          }}
-        >
-          <h2
-            style={{
-              margin: 0,
-
-              fontSize: "22px",
-
-              fontWeight: "700",
-
-              color: "#111827",
-            }}
-          >
-            {editData ? "Edit Timesheet" : "Add Timesheet"}
-          </h2>
-        </div>
-
-        {/* =====================================
-            SCROLLABLE FORM AREA
-            ONLY THIS SECTION SCROLLS
-        ====================================== */}
-        <div
-          style={{
             /*
-              IMPORTANT:
-              This consumes all remaining space
-              between header and footer.
-            */
-            flex: "1 1 0",
+             * IMPORTANT:
+             * Modal height is based on viewport.
+             */
+            height: "calc(100dvh - 24px)",
+
+            maxHeight: "calc(100dvh - 24px)",
 
             minHeight: 0,
 
-            /*
-              ONLY FORM AREA SCROLLS
-            */
-            overflowY: "auto",
+            background: "#ffffff",
 
-            overflowX: "hidden",
-
-            /*
-              Extra bottom padding ensures that
-              Remarks and the last field can be
-              completely scrolled above the footer.
-            */
-            padding: "16px 30px 90px 30px",
+            borderRadius: "12px",
 
             boxSizing: "border-box",
-
-            WebkitOverflowScrolling: "touch",
-
-            scrollbarWidth: "thin",
-          }}
-        >
-          <form
-            id="timesheet-form"
-            onSubmit={handleSubmit}
-          >
-            {/* =====================================
-                DATE
-            ====================================== */}
-            <label style={labelStyle}>
-              Date
-            </label>
-
-            <input
-              type="date"
-              name="WorkDate"
-              value={form.WorkDate}
-              onChange={handleChange}
-              style={inputStyle}
-              required
-            />
-
-            {/* =====================================
-                TASK
-            ====================================== */}
-            <label style={labelStyle}>
-              Task
-            </label>
-
-            <select
-              name="TaskID"
-              value={form.TaskID}
-              onChange={(e) => {
-                const task = tasks.find(
-                  (t) =>
-                    String(t.TaskID) ===
-                    String(e.target.value)
-                );
-
-                setForm((prev) => ({
-                  ...prev,
-
-                  TaskID: e.target.value,
-
-                  Project: task
-                    ? task.TaskName
-                    : "",
-                }));
-              }}
-              style={inputStyle}
-              required
-            >
-              <option value="">
-                Select Task
-              </option>
-
-              {tasks.map((task) => (
-                <option
-                  key={task.TaskID}
-                  value={task.TaskID}
-                >
-                  {task.TaskCode} - {task.TaskName}
-                </option>
-              ))}
-            </select>
-
-            {/* =====================================
-                SELECTED TASK INFORMATION
-            ====================================== */}
-            {selectedTask && (
-              <div
-                style={{
-                  background: "#f8fafc",
-
-                  border: "1px solid #dbeafe",
-
-                  borderRadius: "8px",
-
-                  padding: "15px",
-
-                  marginBottom: "18px",
-
-                  lineHeight: "24px",
-
-                  fontSize: "14px",
-
-                  boxSizing: "border-box",
-                }}
-              >
-                <div>
-                  <b>Approved Hours :</b>{" "}
-                  {selectedTask.ApprovedHours}
-                </div>
-
-                <div>
-                  <b>Hours Spent :</b>{" "}
-                  {selectedTask.HoursSpent}
-                </div>
-
-                <div>
-                  <b>Remaining Hours :</b>{" "}
-                  {selectedTask.RemainingHours}
-                </div>
-              </div>
-            )}
-
-            {/* =====================================
-                TASK DETAILS
-            ====================================== */}
-            <label style={labelStyle}>
-              Task Details
-            </label>
-
-            <textarea
-              rows={4}
-              name="TaskDescription"
-              value={form.TaskDescription}
-              onChange={handleChange}
-              placeholder="Enter Task Details"
-              style={{
-                ...inputStyle,
-                resize: "vertical",
-              }}
-              required
-            />
-
-            {/* =====================================
-                HOURS
-            ====================================== */}
-            <label style={labelStyle}>
-              Hours
-            </label>
-
-            <input
-              type="text"
-              inputMode="decimal"
-              pattern="^\\d+(\\.\\d{0,2})?$"
-              name="HoursWorked"
-              value={form.HoursWorked}
-              onChange={handleChange}
-              placeholder="Examples: 1, 0.25, 0.50, 1.59"
-              style={inputStyle}
-              required
-            />
-
-            {/* =====================================
-                HOURS HELP TEXT
-            ====================================== */}
-            <div
-              style={{
-                marginTop: "-8px",
-
-                marginBottom: "18px",
-
-                fontSize: "12px",
-
-                color: "#6b7280",
-
-                lineHeight: "18px",
-              }}
-            >
-              <div>Examples:</div>
-
-              <div>• 1 = 1 Hour</div>
-
-              <div>• 0.25 = 25 Minutes</div>
-
-              <div>• 0.50 = 50 Minutes</div>
-
-              <div>• 1.25 = 1 Hour 25 Minutes</div>
-
-              <div>• 1.59 = 1 Hour 59 Minutes</div>
-
-              <span
-                style={{
-                  display: "block",
-
-                  marginTop: "2px",
-
-                  color: "#dc2626",
-
-                  fontWeight: "600",
-                }}
-              >
-                Minutes must be between 00 and 59 only.
-              </span>
-            </div>
-
-            {/* =====================================
-                REMARKS
-            ====================================== */}
-            <label style={labelStyle}>
-              Remarks
-            </label>
-
-            <textarea
-              rows={3}
-              name="Remarks"
-              value={form.Remarks}
-              onChange={handleChange}
-              placeholder="Enter Remarks"
-              style={{
-                ...inputStyle,
-                resize: "vertical",
-              }}
-            />
-
-            {/* =====================================
-                EXTRA BOTTOM SPACE
-            ====================================== */}
-            <div
-              style={{
-                height: "20px",
-              }}
-            />
-          </form>
-        </div>
-
-        {/* =====================================
-            FOOTER
-            ALWAYS VISIBLE
-        ====================================== */}
-        <div
-          style={{
-            /*
-              IMPORTANT:
-              Footer never participates in
-              scrolling.
-            */
-            flex: "0 0 72px",
-
-            height: "72px",
-            minHeight: "72px",
 
             display: "flex",
 
-            justifyContent: "flex-end",
+            flexDirection: "column",
 
-            alignItems: "center",
+            overflow: "hidden",
 
-            gap: "10px",
-
-            padding: "10px 30px",
-
-            borderTop: "1px solid #e5e7eb",
-
-            background: "#ffffff",
-
-            boxSizing: "border-box",
-
-            zIndex: 20,
-
-            /*
-              Keep buttons visually separated
-              from the scrolling content.
-            */
             boxShadow:
-              "0 -4px 12px rgba(0,0,0,0.06)",
+              "0 20px 50px rgba(0,0,0,0.25)",
+
+            overscrollBehavior: "contain",
           }}
         >
-          {/* CANCEL */}
-          <button
-            type="button"
-            onClick={onClose}
-            style={cancelBtn}
-          >
-            Cancel
-          </button>
+          {/* =========================================
+              HEADER
+          ========================================= */}
+          <div
+            style={{
+              flex: "0 0 auto",
 
-          {/* SAVE / UPDATE */}
-          <button
-            type="submit"
-            form="timesheet-form"
-            style={saveBtn}
+              padding: "18px 30px 14px 30px",
+
+              background: "#ffffff",
+
+              borderBottom:
+                "1px solid #f1f5f9",
+
+              boxSizing: "border-box",
+
+              zIndex: 20,
+            }}
           >
-            {editData ? "Update" : "Save"}
-          </button>
+            <h2
+              style={{
+                margin: 0,
+
+                fontSize: "22px",
+
+                fontWeight: "700",
+
+                color: "#111827",
+              }}
+            >
+              {editData
+                ? "Edit Timesheet"
+                : "Add Timesheet"}
+            </h2>
+          </div>
+
+          {/* =========================================
+              ONLY THIS SECTION SCROLLS
+          ========================================= */}
+          <div
+            style={{
+              flex: "1 1 0",
+
+              minHeight: 0,
+
+              overflowY: "auto",
+
+              overflowX: "hidden",
+
+              WebkitOverflowScrolling: "touch",
+
+              overscrollBehavior: "contain",
+
+              padding:
+                "16px 30px 24px 30px",
+
+              boxSizing: "border-box",
+
+              scrollbarWidth: "thin",
+            }}
+          >
+            <form
+              id="timesheet-form"
+              onSubmit={handleSubmit}
+            >
+              {/* DATE */}
+              <label style={labelStyle}>
+                Date
+              </label>
+
+              <input
+                type="date"
+                name="WorkDate"
+                value={form.WorkDate}
+                onChange={handleChange}
+                style={inputStyle}
+                required
+              />
+
+              {/* TASK */}
+              <label style={labelStyle}>
+                Task
+              </label>
+
+              <select
+                name="TaskID"
+                value={form.TaskID}
+                onChange={(e) => {
+                  const task = tasks.find(
+                    (t) =>
+                      String(t.TaskID) ===
+                      String(e.target.value)
+                  );
+
+                  setForm((prev) => ({
+                    ...prev,
+
+                    TaskID: e.target.value,
+
+                    Project: task
+                      ? task.TaskName
+                      : "",
+                  }));
+                }}
+                style={inputStyle}
+                required
+              >
+                <option value="">
+                  Select Task
+                </option>
+
+                {tasks.map((task) => (
+                  <option
+                    key={task.TaskID}
+                    value={task.TaskID}
+                  >
+                    {task.TaskCode} -{" "}
+                    {task.TaskName}
+                  </option>
+                ))}
+              </select>
+
+              {/* SELECTED TASK INFORMATION */}
+              {selectedTask && (
+                <div
+                  style={{
+                    background: "#f8fafc",
+
+                    border:
+                      "1px solid #dbeafe",
+
+                    borderRadius: "8px",
+
+                    padding: "15px",
+
+                    marginBottom: "18px",
+
+                    lineHeight: "24px",
+
+                    fontSize: "14px",
+
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <div>
+                    <b>Approved Hours :</b>{" "}
+                    {selectedTask.ApprovedHours}
+                  </div>
+
+                  <div>
+                    <b>Hours Spent :</b>{" "}
+                    {selectedTask.HoursSpent}
+                  </div>
+
+                  <div>
+                    <b>Remaining Hours :</b>{" "}
+                    {selectedTask.RemainingHours}
+                  </div>
+                </div>
+              )}
+
+              {/* TASK DETAILS */}
+              <label style={labelStyle}>
+                Task Details
+              </label>
+
+              <textarea
+                rows={4}
+                name="TaskDescription"
+                value={form.TaskDescription}
+                onChange={handleChange}
+                placeholder="Enter Task Details"
+                style={{
+                  ...inputStyle,
+                  resize: "vertical",
+                }}
+                required
+              />
+
+              {/* HOURS */}
+              <label style={labelStyle}>
+                Hours
+              </label>
+
+              <input
+                type="text"
+                inputMode="decimal"
+                pattern="^\\d+(\\.\\d{0,2})?$"
+                name="HoursWorked"
+                value={form.HoursWorked}
+                onChange={handleChange}
+                placeholder="Examples: 1, 0.25, 0.50, 1.59"
+                style={inputStyle}
+                required
+              />
+
+              {/* HOURS HELP */}
+              <div
+                style={{
+                  marginTop: "-8px",
+
+                  marginBottom: "18px",
+
+                  fontSize: "12px",
+
+                  color: "#6b7280",
+
+                  lineHeight: "18px",
+                }}
+              >
+                <div>Examples:</div>
+
+                <div>• 1 = 1 Hour</div>
+
+                <div>
+                  • 0.25 = 25 Minutes
+                </div>
+
+                <div>
+                  • 0.50 = 50 Minutes
+                </div>
+
+                <div>
+                  • 1.25 = 1 Hour 25 Minutes
+                </div>
+
+                <div>
+                  • 1.59 = 1 Hour 59 Minutes
+                </div>
+
+                <span
+                  style={{
+                    display: "block",
+
+                    marginTop: "2px",
+
+                    color: "#dc2626",
+
+                    fontWeight: "600",
+                  }}
+                >
+                  Minutes must be between 00
+                  and 59 only.
+                </span>
+              </div>
+
+              {/* REMARKS */}
+              <label style={labelStyle}>
+                Remarks
+              </label>
+
+              <textarea
+                rows={3}
+                name="Remarks"
+                value={form.Remarks}
+                onChange={handleChange}
+                placeholder="Enter Remarks"
+                style={{
+                  ...inputStyle,
+                  resize: "vertical",
+                }}
+              />
+
+              {/* EXTRA SPACE AT BOTTOM */}
+              <div
+                style={{
+                  height: "20px",
+                }}
+              />
+            </form>
+          </div>
+
+          {/* =========================================
+              FOOTER
+              NEVER PART OF SCROLL
+          ========================================= */}
+          <div
+            style={{
+              flex: "0 0 72px",
+
+              height: "72px",
+
+              minHeight: "72px",
+
+              display: "flex",
+
+              justifyContent: "flex-end",
+
+              alignItems: "center",
+
+              gap: "10px",
+
+              padding: "10px 30px",
+
+              borderTop:
+                "1px solid #e5e7eb",
+
+              background: "#ffffff",
+
+              boxSizing: "border-box",
+
+              zIndex: 50,
+
+              boxShadow:
+                "0 -4px 12px rgba(0,0,0,0.06)",
+            }}
+          >
+            {/* CANCEL */}
+            <button
+              type="button"
+              onClick={onClose}
+              style={cancelBtn}
+            >
+              Cancel
+            </button>
+
+            {/* SAVE / UPDATE */}
+            <button
+              type="submit"
+              form="timesheet-form"
+              style={saveBtn}
+            >
+              {editData ? "Update" : "Save"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
-/* =====================================
-   LABEL STYLE
-===================================== */
+/* =========================================
+   LABEL
+========================================= */
 
 const labelStyle = {
   fontWeight: "600",
@@ -623,9 +615,9 @@ const labelStyle = {
   color: "#111827",
 };
 
-/* =====================================
-   INPUT STYLE
-===================================== */
+/* =========================================
+   INPUT
+========================================= */
 
 const inputStyle = {
   width: "100%",
@@ -649,9 +641,9 @@ const inputStyle = {
   color: "#111827",
 };
 
-/* =====================================
+/* =========================================
    SAVE BUTTON
-===================================== */
+========================================= */
 
 const saveBtn = {
   background: "#2563eb",
@@ -675,13 +667,11 @@ const saveBtn = {
   fontSize: "14px",
 
   flexShrink: 0,
-
-  whiteSpace: "nowrap",
 };
 
-/* =====================================
+/* =========================================
    CANCEL BUTTON
-===================================== */
+========================================= */
 
 const cancelBtn = {
   background: "#6b7280",
@@ -705,6 +695,4 @@ const cancelBtn = {
   fontSize: "14px",
 
   flexShrink: 0,
-
-  whiteSpace: "nowrap",
 };
