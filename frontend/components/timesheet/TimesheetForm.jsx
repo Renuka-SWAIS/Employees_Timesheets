@@ -26,9 +26,9 @@ export default function TimesheetForm({
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
 
-  /* -----------------------------
+  /* --------------------------------
      LOAD EDIT DATA
-  ----------------------------- */
+  -------------------------------- */
   useEffect(() => {
     if (editData) {
       setForm({
@@ -46,9 +46,9 @@ export default function TimesheetForm({
     }
   }, [editData]);
 
-  /* -----------------------------
+  /* --------------------------------
      HANDLE INPUT CHANGE
-  ----------------------------- */
+  -------------------------------- */
   function handleChange(e) {
     const { name, value } = e.target;
 
@@ -58,9 +58,9 @@ export default function TimesheetForm({
     }));
   }
 
-  /* -----------------------------
+  /* --------------------------------
      LOAD TASKS
-  ----------------------------- */
+  -------------------------------- */
   useEffect(() => {
     async function loadTasks() {
       try {
@@ -74,9 +74,9 @@ export default function TimesheetForm({
     loadTasks();
   }, []);
 
-  /* -----------------------------
+  /* --------------------------------
      SELECTED TASK
-  ----------------------------- */
+  -------------------------------- */
   useEffect(() => {
     const task = tasks.find(
       (t) => String(t.TaskID) === String(form.TaskID)
@@ -87,19 +87,22 @@ export default function TimesheetForm({
 
   if (!open) return null;
 
-  /* -----------------------------
+  /* --------------------------------
      HOURS VALIDATION
-  ----------------------------- */
+  -------------------------------- */
   function validateHours(hours) {
     if (!hours) return false;
 
     const text = hours.toString().trim();
 
-    // Allows:
-    // 1
-    // 1.25
-    // 1.59
-    // 0.50
+    /*
+      Allowed:
+      1
+      1.25
+      1.50
+      1.59
+      0.50
+    */
     if (!/^\d+(\.\d{2})?$/.test(text)) {
       return false;
     }
@@ -124,9 +127,9 @@ export default function TimesheetForm({
     return true;
   }
 
-  /* -----------------------------
+  /* --------------------------------
      SUBMIT
-  ----------------------------- */
+  -------------------------------- */
   function handleSubmit(e) {
     e.preventDefault();
 
@@ -190,7 +193,7 @@ export default function TimesheetForm({
         position: "fixed",
         inset: 0,
 
-        background: "rgba(0,0,0,.45)",
+        background: "rgba(0,0,0,0.45)",
 
         display: "flex",
         justifyContent: "center",
@@ -198,10 +201,17 @@ export default function TimesheetForm({
 
         zIndex: 9999,
 
+        /*
+          Keep a little space around the modal.
+        */
         padding: "12px",
 
         boxSizing: "border-box",
 
+        /*
+          IMPORTANT:
+          Background overlay itself must not scroll.
+        */
         overflow: "hidden",
       }}
     >
@@ -213,16 +223,17 @@ export default function TimesheetForm({
           position: "relative",
 
           width: "600px",
-
           maxWidth: "100%",
 
           /*
-           * IMPORTANT:
-           * Use dvh so browser viewport height
-           * is handled correctly.
-           */
-          height: "calc(100dvh - 24px)",
+            IMPORTANT:
+            The modal height is limited to the
+            visible browser viewport.
 
+            100dvh works better with browser
+            zoom / dynamic viewport changes.
+          */
+          height: "calc(100dvh - 24px)",
           maxHeight: "calc(100dvh - 24px)",
 
           minHeight: 0,
@@ -233,10 +244,13 @@ export default function TimesheetForm({
 
           boxSizing: "border-box",
 
+          /*
+            IMPORTANT:
+            Modal itself NEVER scrolls.
+          */
           overflow: "hidden",
 
           display: "flex",
-
           flexDirection: "column",
 
           boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
@@ -244,12 +258,13 @@ export default function TimesheetForm({
       >
         {/* =====================================
             HEADER
+            ALWAYS VISIBLE
         ====================================== */}
         <div
           style={{
-            flexShrink: 0,
+            flex: "0 0 auto",
 
-            padding: "20px 30px 12px 30px",
+            padding: "18px 30px 12px 30px",
 
             background: "#ffffff",
 
@@ -277,23 +292,32 @@ export default function TimesheetForm({
 
         {/* =====================================
             SCROLLABLE FORM AREA
+            ONLY THIS SECTION SCROLLS
         ====================================== */}
         <div
           style={{
-            flex: "1 1 auto",
+            /*
+              IMPORTANT:
+              This consumes all remaining space
+              between header and footer.
+            */
+            flex: "1 1 0",
 
             minHeight: 0,
 
+            /*
+              ONLY FORM AREA SCROLLS
+            */
             overflowY: "auto",
 
             overflowX: "hidden",
 
             /*
-             * IMPORTANT:
-             * Extra bottom space prevents the last
-             * field from being hidden behind footer.
-             */
-            padding: "16px 30px 100px 30px",
+              Extra bottom padding ensures that
+              Remarks and the last field can be
+              completely scrolled above the footer.
+            */
+            padding: "16px 30px 90px 30px",
 
             boxSizing: "border-box",
 
@@ -385,6 +409,8 @@ export default function TimesheetForm({
                   lineHeight: "24px",
 
                   fontSize: "14px",
+
+                  boxSizing: "border-box",
                 }}
               >
                 <div>
@@ -443,7 +469,9 @@ export default function TimesheetForm({
               required
             />
 
-            {/* HOURS HELP TEXT */}
+            {/* =====================================
+                HOURS HELP TEXT
+            ====================================== */}
             <div
               style={{
                 marginTop: "-8px",
@@ -503,7 +531,9 @@ export default function TimesheetForm({
               }}
             />
 
-            {/* Extra bottom space */}
+            {/* =====================================
+                EXTRA BOTTOM SPACE
+            ====================================== */}
             <div
               style={{
                 height: "20px",
@@ -513,19 +543,20 @@ export default function TimesheetForm({
         </div>
 
         {/* =====================================
-            FIXED FOOTER
+            FOOTER
+            ALWAYS VISIBLE
         ====================================== */}
         <div
           style={{
-            position: "absolute",
-
-            left: 0,
-
-            right: 0,
-
-            bottom: 0,
+            /*
+              IMPORTANT:
+              Footer never participates in
+              scrolling.
+            */
+            flex: "0 0 72px",
 
             height: "72px",
+            minHeight: "72px",
 
             display: "flex",
 
@@ -543,9 +574,14 @@ export default function TimesheetForm({
 
             boxSizing: "border-box",
 
-            zIndex: 10,
+            zIndex: 20,
 
-            boxShadow: "0 -4px 12px rgba(0,0,0,0.06)",
+            /*
+              Keep buttons visually separated
+              from the scrolling content.
+            */
+            boxShadow:
+              "0 -4px 12px rgba(0,0,0,0.06)",
           }}
         >
           {/* CANCEL */}
@@ -637,6 +673,10 @@ const saveBtn = {
   fontWeight: "600",
 
   fontSize: "14px",
+
+  flexShrink: 0,
+
+  whiteSpace: "nowrap",
 };
 
 /* =====================================
@@ -663,4 +703,8 @@ const cancelBtn = {
   fontWeight: "600",
 
   fontSize: "14px",
+
+  flexShrink: 0,
+
+  whiteSpace: "nowrap",
 };
