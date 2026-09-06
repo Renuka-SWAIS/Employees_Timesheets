@@ -25,15 +25,18 @@ router = APIRouter(
 
 UPLOAD_FOLDER = "uploads"
 
-
 # =====================================================
 # Request Model
 # =====================================================
 
 class EmployeeUpdate(BaseModel):
+    EmployeeCode: Optional[str] = None
     EmployeeName: Optional[str] = None
+    EmailID: Optional[str] = None
+    RoleType: Optional[str] = None
     Department: Optional[str] = None
     Designation: Optional[str] = None
+    Status: Optional[str] = None
 
 
 # =====================================================
@@ -225,7 +228,6 @@ def upload_photo(
         "PhotoURL": employee.PhotoURL,
     }
 
-
 # =====================================================
 # Update Employee
 # =====================================================
@@ -249,14 +251,26 @@ def update_employee(
 
     employee = get_employee_by_id(db, employee_id)
 
+    if data.EmployeeCode is not None:
+        employee.EmployeeCode = data.EmployeeCode
+
     if data.EmployeeName is not None:
         employee.EmployeeName = data.EmployeeName
+
+    if data.EmailID is not None:
+        employee.EmailID = data.EmailID
+
+    if data.RoleType is not None:
+        employee.RoleType = data.RoleType
 
     if data.Department is not None:
         employee.Department = data.Department
 
     if data.Designation is not None:
         employee.Designation = data.Designation
+
+    if data.Status is not None:
+        employee.Status = data.Status
 
     employee.ModifiedDate = datetime.now()
 
@@ -267,13 +281,16 @@ def update_employee(
         "message": "Employee updated successfully",
         "employee": {
             "EmployeeID": str(employee.EmployeeID),
+            "EmployeeCode": employee.EmployeeCode,
             "EmployeeName": employee.EmployeeName,
+            "EmailID": employee.EmailID,
+            "RoleType": employee.RoleType,
             "Department": employee.Department,
             "Designation": employee.Designation,
+            "Status": employee.Status,
             "PhotoURL": employee.PhotoURL,
         },
     }
-
 
 # =====================================================
 # Get Employee By ID

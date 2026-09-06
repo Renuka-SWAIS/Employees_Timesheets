@@ -76,7 +76,7 @@ export default function LoginPage() {
         <div className="login-logo">
           <h1>SWAIS</h1>
           <p className="employee-title">
-            Employee Timesheet
+            Employees Page
           </p>
         </div>
 
