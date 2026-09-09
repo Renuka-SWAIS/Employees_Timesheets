@@ -60,9 +60,9 @@ export default function EmployeesPage() {
         .filter(Boolean)
     ),
   ];
-
-  const filteredEmployees = useMemo(() => {
-    return employees.filter((emp) => {
+const filteredEmployees = useMemo(() => {
+  return employees
+    .filter((emp) => {
       const matchesSearch =
         emp.EmployeeName?.toLowerCase().includes(search.toLowerCase()) ||
         emp.EmployeeCode?.toLowerCase().includes(search.toLowerCase()) ||
@@ -83,9 +83,15 @@ export default function EmployeesPage() {
         matchesRole &&
         matchesStatus
       );
-    });
-  }, [employees, search, department, role, status]);
-
+    })
+    .sort((a, b) =>
+      String(a.EmployeeCode).localeCompare(
+        String(b.EmployeeCode),
+        undefined,
+        { numeric: true }
+      )
+    );
+}, [employees, search, department, role, status]);
   if (authorized === null) {
     return null;
   }

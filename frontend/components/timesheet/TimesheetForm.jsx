@@ -154,13 +154,13 @@ export default function TimesheetForm({
       return;
     }
 
+    /* --------------------------------
+       TASK DETAILS
+       Only required.
+       NO MINIMUM CHARACTER CHECK.
+    -------------------------------- */
     if (!form.TaskDescription.trim()) {
       alert("Task Details are required.");
-      return;
-    }
-
-    if (form.TaskDescription.trim().length < 10) {
-      alert("Task Details must be at least 10 characters.");
       return;
     }
 
@@ -179,7 +179,9 @@ export default function TimesheetForm({
 
     const payload = {
       WorkDate: form.WorkDate,
+
       Month: new Date(form.WorkDate).getMonth() + 1,
+
       Year: new Date(form.WorkDate).getFullYear(),
 
       TaskID: form.TaskID,
@@ -200,17 +202,15 @@ export default function TimesheetForm({
     <>
       {/* =========================================
           FULL SCREEN OVERLAY
-          BACKGROUND CANNOT SCROLL
       ========================================= */}
       <div
         style={{
           position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
+
+          inset: 0,
 
           width: "100%",
+
           height: "100dvh",
 
           background: "rgba(0,0,0,0.45)",
@@ -218,7 +218,9 @@ export default function TimesheetForm({
           zIndex: 99999,
 
           display: "flex",
+
           alignItems: "center",
+
           justifyContent: "center",
 
           padding: "12px",
@@ -232,18 +234,20 @@ export default function TimesheetForm({
       >
         {/* =========================================
             MODAL
+
+            GRID:
+            1. Header
+            2. Scrollable Form
+            3. Fixed Footer
         ========================================= */}
         <div
           style={{
             position: "relative",
 
             width: "600px",
+
             maxWidth: "100%",
 
-            /*
-             * IMPORTANT:
-             * Modal height is based on viewport.
-             */
             height: "calc(100dvh - 24px)",
 
             maxHeight: "calc(100dvh - 24px)",
@@ -256,9 +260,10 @@ export default function TimesheetForm({
 
             boxSizing: "border-box",
 
-            display: "flex",
+            display: "grid",
 
-            flexDirection: "column",
+            gridTemplateRows:
+              "auto minmax(0, 1fr) 72px",
 
             overflow: "hidden",
 
@@ -273,8 +278,6 @@ export default function TimesheetForm({
           ========================================= */}
           <div
             style={{
-              flex: "0 0 auto",
-
               padding: "18px 30px 14px 30px",
 
               background: "#ffffff",
@@ -305,13 +308,13 @@ export default function TimesheetForm({
           </div>
 
           {/* =========================================
-              ONLY THIS SECTION SCROLLS
+              SCROLLABLE FORM SECTION
           ========================================= */}
           <div
             style={{
-              flex: "1 1 0",
-
               minHeight: 0,
+
+              height: "100%",
 
               overflowY: "auto",
 
@@ -321,8 +324,7 @@ export default function TimesheetForm({
 
               overscrollBehavior: "contain",
 
-              padding:
-                "16px 30px 24px 30px",
+              padding: "16px 30px 24px 30px",
 
               boxSizing: "border-box",
 
@@ -333,7 +335,9 @@ export default function TimesheetForm({
               id="timesheet-form"
               onSubmit={handleSubmit}
             >
-              {/* DATE */}
+              {/* =================================
+                  DATE
+              ================================= */}
               <label style={labelStyle}>
                 Date
               </label>
@@ -347,7 +351,9 @@ export default function TimesheetForm({
                 required
               />
 
-              {/* TASK */}
+              {/* =================================
+                  TASK
+              ================================= */}
               <label style={labelStyle}>
                 Task
               </label>
@@ -390,7 +396,9 @@ export default function TimesheetForm({
                 ))}
               </select>
 
-              {/* SELECTED TASK INFORMATION */}
+              {/* =================================
+                  SELECTED TASK INFORMATION
+              ================================= */}
               {selectedTask && (
                 <div
                   style={{
@@ -429,7 +437,9 @@ export default function TimesheetForm({
                 </div>
               )}
 
-              {/* TASK DETAILS */}
+              {/* =================================
+                  TASK DETAILS
+              ================================= */}
               <label style={labelStyle}>
                 Task Details
               </label>
@@ -447,7 +457,9 @@ export default function TimesheetForm({
                 required
               />
 
-              {/* HOURS */}
+              {/* =================================
+                  HOURS
+              ================================= */}
               <label style={labelStyle}>
                 Hours
               </label>
@@ -464,7 +476,9 @@ export default function TimesheetForm({
                 required
               />
 
-              {/* HOURS HELP */}
+              {/* =================================
+                  HOURS HELP
+              ================================= */}
               <div
                 style={{
                   marginTop: "-8px",
@@ -480,7 +494,9 @@ export default function TimesheetForm({
               >
                 <div>Examples:</div>
 
-                <div>• 1 = 1 Hour</div>
+                <div>
+                  • 1 = 1 Hour
+                </div>
 
                 <div>
                   • 0.25 = 25 Minutes
@@ -514,7 +530,9 @@ export default function TimesheetForm({
                 </span>
               </div>
 
-              {/* REMARKS */}
+              {/* =================================
+                  REMARKS
+              ================================= */}
               <label style={labelStyle}>
                 Remarks
               </label>
@@ -531,7 +549,7 @@ export default function TimesheetForm({
                 }}
               />
 
-              {/* EXTRA SPACE AT BOTTOM */}
+              {/* BOTTOM SPACE */}
               <div
                 style={{
                   height: "20px",
@@ -542,15 +560,17 @@ export default function TimesheetForm({
 
           {/* =========================================
               FOOTER
-              NEVER PART OF SCROLL
+
+              ALWAYS VISIBLE
+              NEVER SCROLLS
           ========================================= */}
           <div
             style={{
-              flex: "0 0 72px",
-
               height: "72px",
 
               minHeight: "72px",
+
+              width: "100%",
 
               display: "flex",
 
@@ -569,13 +589,15 @@ export default function TimesheetForm({
 
               boxSizing: "border-box",
 
-              zIndex: 50,
+              zIndex: 100,
 
               boxShadow:
                 "0 -4px 12px rgba(0,0,0,0.06)",
             }}
           >
-            {/* CANCEL */}
+            {/* =================================
+                CANCEL
+            ================================= */}
             <button
               type="button"
               onClick={onClose}
@@ -584,13 +606,17 @@ export default function TimesheetForm({
               Cancel
             </button>
 
-            {/* SAVE / UPDATE */}
+            {/* =================================
+                SAVE / UPDATE
+            ================================= */}
             <button
               type="submit"
               form="timesheet-form"
               style={saveBtn}
             >
-              {editData ? "Update" : "Save"}
+              {editData
+                ? "Update"
+                : "Save"}
             </button>
           </div>
         </div>
@@ -600,7 +626,7 @@ export default function TimesheetForm({
 }
 
 /* =========================================
-   LABEL
+   LABEL STYLE
 ========================================= */
 
 const labelStyle = {
@@ -616,7 +642,7 @@ const labelStyle = {
 };
 
 /* =========================================
-   INPUT
+   INPUT STYLE
 ========================================= */
 
 const inputStyle = {

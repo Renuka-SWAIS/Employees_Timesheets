@@ -50,8 +50,10 @@ export default function TimesheetPage() {
   // ==========================================
   // Filter Timesheets
   // ==========================================
+
   const filteredTimesheets = useMemo(() => {
-    return timesheets.filter((item) => {
+  return timesheets
+    .filter((item) => {
       const matchesSearch =
         item.Project?.toLowerCase().includes(
           search.toLowerCase()
@@ -66,9 +68,11 @@ export default function TimesheetPage() {
         }) === month;
 
       return matchesSearch && matchesMonth;
+    })
+    .sort((a, b) => {
+      return new Date(b.WorkDate) - new Date(a.WorkDate);
     });
-  }, [timesheets, search, month]);
-
+}, [timesheets, search, month]);
   // ==========================================
   // Check Current Month
   // ==========================================
