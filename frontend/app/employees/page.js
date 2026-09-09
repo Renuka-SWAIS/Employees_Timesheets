@@ -60,38 +60,48 @@ export default function EmployeesPage() {
         .filter(Boolean)
     ),
   ];
-const filteredEmployees = useMemo(() => {
-  return employees
-    .filter((emp) => {
-      const matchesSearch =
-        emp.EmployeeName?.toLowerCase().includes(search.toLowerCase()) ||
-        emp.EmployeeCode?.toLowerCase().includes(search.toLowerCase()) ||
-        emp.EmailID?.toLowerCase().includes(search.toLowerCase());
 
-      const matchesDepartment =
-        department === "" || emp.Department === department;
+  const filteredEmployees = useMemo(() => {
+    return employees
+      .filter((emp) => {
+        const matchesSearch =
+          emp.EmployeeName?.toLowerCase().includes(search.toLowerCase()) ||
+          emp.EmployeeCode?.toLowerCase().includes(search.toLowerCase()) ||
+          emp.EmailID?.toLowerCase().includes(search.toLowerCase());
 
-      const matchesRole =
-        role === "" || emp.RoleType === role;
+        const matchesDepartment =
+          department === "" || emp.Department === department;
 
-      const matchesStatus =
-        status === "" || emp.Status === status;
+        const matchesRole =
+          role === "" || emp.RoleType === role;
 
-      return (
-        matchesSearch &&
-        matchesDepartment &&
-        matchesRole &&
-        matchesStatus
-      );
-    })
-    .sort((a, b) =>
-      String(a.EmployeeCode).localeCompare(
-        String(b.EmployeeCode),
-        undefined,
-        { numeric: true }
-      )
-    );
-}, [employees, search, department, role, status]);
+        const matchesStatus =
+          status === "" || emp.Status === status;
+
+        return (
+          matchesSearch &&
+          matchesDepartment &&
+          matchesRole &&
+          matchesStatus
+        );
+      })
+      .sort((a, b) => {
+        const codeA =
+          parseInt(
+            String(a.EmployeeCode || "").replace(/\D/g, ""),
+            10
+          ) || 0;
+
+        const codeB =
+          parseInt(
+            String(b.EmployeeCode || "").replace(/\D/g, ""),
+            10
+          ) || 0;
+
+        return codeA - codeB;
+      });
+  }, [employees, search, department, role, status]);
+
   if (authorized === null) {
     return null;
   }
