@@ -463,18 +463,16 @@ export default function TimesheetForm({
               <label style={labelStyle}>
                 Hours
               </label>
-
-              <input
-                type="text"
-                inputMode="decimal"
-                pattern="^\\d+(\\.\\d{0,2})?$"
-                name="HoursWorked"
-                value={form.HoursWorked}
-                onChange={handleChange}
-                placeholder="Examples: 1, 0.25, 0.50, 1.59"
-                style={inputStyle}
-                required
-              />
+<input
+  type="text"
+  inputMode="decimal"
+  name="HoursWorked"
+  value={form.HoursWorked}
+  onChange={handleChange}
+  placeholder="Examples: 1, 0.25, 0.50, 1.59"
+  style={inputStyle}
+  required
+/>
 
               {/* =================================
                   HOURS HELP
