@@ -12,8 +12,12 @@ export default function DashboardCards({ timesheets }) {
 
   // Unique working days
   const totalDays = new Set(
-    timesheets.map((item) => item.WorkDate)
-  ).size;
+  timesheets.map((item) => {
+    const date = new Date(item.WorkDate);
+
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+  })
+).size;
 
   // Current date
   const today = new Date();

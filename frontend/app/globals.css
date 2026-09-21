@@ -14,14 +14,19 @@ display:flex;
 min-height:100vh;
 }
 
-.sidebar{
-width:250px;
-background:#111827;
-color:white;
-padding:30px;
-display:flex;
-flex-direction:column;
-justify-content:space-between;
+.sidebar {
+  width: 250px;
+  background: #111827;
+  color: white;
+  padding: 30px;
+
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar h2{
@@ -321,4 +326,82 @@ color:white;
   margin-bottom: 20px;   /* Increase to 25px or 30px if you want more gap */
   color: #d1d5db;
   font-size: 16px;
+}
+/* ==========================
+   MOBILE RESPONSIVE
+========================== */
+
+@media (max-width: 768px) {
+
+  .dashboard {
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    padding: 20px;
+  }
+
+  .sidebar-logo {
+    margin-bottom: 15px;
+  }
+
+  .sidebar-subtitle {
+    margin-bottom: 15px;
+  }
+
+  .sidebar-menu {
+    gap: 10px;
+  }
+
+  .sidebar-menu a {
+    padding: 8px 0;
+  }
+
+  .logout {
+    margin-top: 20px;
+  }
+
+  .main {
+    width: 100%;
+    min-width: 0;
+    padding: 15px;
+  }
+
+  .navbar {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .navbar h2 {
+    font-size: 24px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .card {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .tableCard {
+    width: 100%;
+    overflow-x: auto;
+    padding: 15px;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 10px;
+  }
 }

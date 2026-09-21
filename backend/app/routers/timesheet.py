@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from app.database.database import get_db
 from app.models.timesheet import Timesheet
+from app.models.employee import Employee
 from app.schemas.timesheet import TimesheetCreate, TimesheetUpdate
 from app.utils.dependencies import get_current_user
 
@@ -25,9 +26,30 @@ def get_timesheets(
     current_user: dict = Depends(get_current_user),
 ):
 
-    # Admin -> All employees' timesheets
-    if current_user["role"] == "Admin":
-        return db.query(Timesheet).all()
+   # Admin -> All employees' timesheets with employee details
+if current_user["role"] == "Admin":
+    results = (
+        db.query(
+            Timesheet,
+            Employee.EmployeeName,
+            Employee.EmployeeCode,
+        )
+        .join(
+            Employee,
+            Timesheet.EmployeeID == Employee.EmployeeID,
+        )
+        .order_by(Timesheet.WorkDate.desc())
+        .all()
+    )
+
+    return [
+        {
+            **timesheet.__dict__,
+            "EmployeeName": employee_name,
+            "EmployeeCode": employee_code,
+        }
+        for timesheet, employee_name, employee_code in results
+    ]
 
     # Employee -> Only own timesheets
     return (
