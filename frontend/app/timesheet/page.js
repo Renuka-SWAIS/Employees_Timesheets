@@ -199,14 +199,15 @@ export default function TimesheetPage() {
       />
 
       <TimesheetForm
-        open={showForm}
-        editData={selected}
-        onClose={() => {
-          setShowForm(false);
-          setSelected(null);
-        }}
-        onSave={handleSave}
-      />
+  open={showForm}
+  editData={selected}
+  isAdmin={isAdmin}
+  onClose={() => {
+    setShowForm(false);
+    setSelected(null);
+  }}
+  onSave={handleSave}
+/>
 
       <DeleteModal
         open={showDelete}

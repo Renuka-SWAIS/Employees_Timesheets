@@ -21,6 +21,7 @@ export default function TimesheetForm({
   onClose,
   onSave,
   editData,
+  isAdmin,
 }) {
   const [form, setForm] = useState(initialState);
   const [tasks, setTasks] = useState([]);
@@ -148,6 +149,24 @@ export default function TimesheetForm({
       alert("Date is required.");
       return;
     }
+    // User date restriction
+if (!isAdmin) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const selectedDate = new Date(form.WorkDate);
+  selectedDate.setHours(0, 0, 0, 0);
+
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - 7);
+
+  if (selectedDate < sevenDaysAgo) {
+    alert(
+      "You cannot enter a timesheet for a date older than 7 days."
+    );
+    return;
+  }
+}
 
     if (!form.TaskID) {
       alert("Please select a task.");
