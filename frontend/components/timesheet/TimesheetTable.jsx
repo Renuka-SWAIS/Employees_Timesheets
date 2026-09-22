@@ -74,7 +74,7 @@ export default function TimesheetTable({
       .toFixed(2);
   }
 
-  const columnCount = readOnly ? 5 : 6;
+  const columnCount = readOnly ? 6 : 7;
 
   return (
     <div className="tableCard">
@@ -90,7 +90,7 @@ export default function TimesheetTable({
             <th>Task Description</th>
             <th>Hours</th>
             <th>Remarks</th>
-
+<th>Entered By</th>
             {!readOnly && <th>Actions</th>}
           </tr>
         </thead>
@@ -265,12 +265,15 @@ export default function TimesheetTable({
                       </td>
 
                       {/* Remarks */}
-                      <td>
-                        {item.Remarks || "-"}
-                      </td>
+                     <td>
+  {item.Remarks || "-"}
+</td>
 
-                      {/* Actions */}
-                      {!readOnly && (
+<td>
+  {item.EnteredBy || item.CreatedBy || "-"}
+</td>
+
+{!readOnly && (
                         <td>
                           <div
                             style={{
