@@ -1,7 +1,7 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 from uuid import uuid4
 
 from app.database.database import get_db
@@ -15,7 +15,6 @@ router = APIRouter(
     prefix="/timesheet",
     tags=["Timesheet"]
 )
-
 # ==========================================
 # Get All Timesheets
 # ==========================================
@@ -27,17 +26,27 @@ def get_timesheets(
 
     # Admin -> All employees' timesheets with employee details
     if current_user["role"] == "Admin":
+
+        EmployeeCreated = aliased(Employee)
+
         results = (
             db.query(
                 Timesheet,
                 Employee.EmployeeName,
                 Employee.EmployeeCode,
+                EmployeeCreated.EmployeeName.label("EnteredBy"),
             )
             .join(
                 Employee,
                 Timesheet.EmployeeID == Employee.EmployeeID,
             )
-            .order_by(Timesheet.WorkDate.desc())
+            .outerjoin(
+                EmployeeCreated,
+                EmployeeCreated.EmailID == Timesheet.CreatedBy,
+            )
+            .order_by(
+                Timesheet.WorkDate.desc()
+            )
             .all()
         )
 
@@ -46,8 +55,14 @@ def get_timesheets(
                 **timesheet.__dict__,
                 "EmployeeName": employee_name,
                 "EmployeeCode": employee_code,
+                "EnteredBy": entered_by,
             }
-            for timesheet, employee_name, employee_code in results
+            for (
+                timesheet,
+                employee_name,
+                employee_code,
+                entered_by,
+            ) in results
         ]
 
     # Employee -> Only own timesheets
