@@ -259,18 +259,28 @@ export default function EmployeesPage() {
           setEditingEmployee(null);
         }}
         onSave={async (data) => {
-          if (editingEmployee) {
-            await editEmployee(
-              editingEmployee.EmployeeID,
-              data
-            );
-          } else {
-            await addEmployee(data);
-          }
+  try {
+    if (editingEmployee) {
+      await editEmployee(
+        editingEmployee.EmployeeID,
+        data
+      );
+    } else {
+      await addEmployee(data);
+    }
 
-          setShowForm(false);
-          setEditingEmployee(null);
-        }}
+    setShowForm(false);
+    setEditingEmployee(null);
+
+  } catch (error) {
+    console.error("Employee save failed:", error);
+
+    alert(
+      error?.message ||
+      "Unable to save employee. Please try again."
+    );
+  }
+}}
       />
 
     </MainLayout>
