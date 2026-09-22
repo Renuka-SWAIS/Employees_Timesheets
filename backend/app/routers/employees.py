@@ -227,7 +227,6 @@ def upload_photo(
         "message": "Photo uploaded successfully",
         "PhotoURL": employee.PhotoURL,
     }
-
 # =====================================================
 # Update Employee
 # =====================================================
@@ -251,7 +250,27 @@ def update_employee(
 
     employee = get_employee_by_id(db, employee_id)
 
+    # =====================================================
+    # Check Duplicate Employee Code
+    # =====================================================
+
     if data.EmployeeCode is not None:
+
+        existing_employee = (
+            db.query(Employee)
+            .filter(
+                Employee.EmployeeCode == data.EmployeeCode,
+                Employee.EmployeeID != employee.EmployeeID,
+            )
+            .first()
+        )
+
+        if existing_employee:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Employee Code {data.EmployeeCode} already exists",
+            )
+
         employee.EmployeeCode = data.EmployeeCode
 
     if data.EmployeeName is not None:
@@ -291,7 +310,6 @@ def update_employee(
             "PhotoURL": employee.PhotoURL,
         },
     }
-
 # =====================================================
 # Get Employee By ID
 # =====================================================
