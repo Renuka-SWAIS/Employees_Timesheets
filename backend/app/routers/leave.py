@@ -51,6 +51,12 @@ def get_leaves(
                     "FromDate": leave.FromDate,
                     "ToDate": leave.ToDate,
                     "TotalDays": leave.TotalDays,
+                    "LeaveDuration": (
+                        "Half Day"
+                        if leave.TotalDays == 0.5
+                        else "Full Day"
+                    ),
+                    "HalfDaySession": leave.HalfDaySession,
                     "Reason": leave.Reason,
                 }
             )
@@ -113,7 +119,54 @@ def create_leave(
                 detail="Not authorized to create leave for another employee",
             )
 
-        total_days = (leave.ToDate - leave.FromDate).days + 1
+        # ==========================================
+        # Validate Dates
+        # ==========================================
+
+        if leave.ToDate < leave.FromDate:
+            raise HTTPException(
+                status_code=400,
+                detail="To Date cannot be before From Date",
+            )
+
+        # ==========================================
+        # Calculate Leave Days
+        # ==========================================
+
+        total_days = (
+            leave.ToDate - leave.FromDate
+        ).days + 1
+
+        # ==========================================
+        # Half Day Validation
+        # ==========================================
+
+        if leave.LeaveDuration == "Half Day":
+
+            if total_days != 1:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Half Day leave can only be applied for one day",
+                )
+
+            if leave.HalfDaySession not in [
+                "First Half",
+                "Second Half",
+            ]:
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "Please select First Half or Second Half "
+                        "for Half Day leave"
+                    ),
+                )
+
+            total_days = 0.5
+
+        else:
+
+            # Full Day
+            leave.HalfDaySession = None
 
         new_leave = Leave(
             LeaveID=uuid4(),
@@ -122,6 +175,7 @@ def create_leave(
             FromDate=leave.FromDate,
             ToDate=leave.ToDate,
             TotalDays=float(total_days),
+            HalfDaySession=leave.HalfDaySession,
             Reason=leave.Reason,
         )
 
@@ -137,6 +191,7 @@ def create_leave(
     except SQLAlchemyError as e:
         db.rollback()
         print("DATABASE ERROR:", e)
+
         raise HTTPException(
             status_code=500,
             detail=str(e),
@@ -156,7 +211,9 @@ def update_leave(
 
     leave = (
         db.query(Leave)
-        .filter(Leave.LeaveID == UUID(leave_id))
+        .filter(
+            Leave.LeaveID == UUID(leave_id)
+        )
         .first()
     )
 
@@ -176,15 +233,84 @@ def update_leave(
             detail="Not authorized to edit this leave",
         )
 
-    update_data = data.model_dump(exclude_unset=True)
+    update_data = data.model_dump(
+        exclude_unset=True
+    )
 
-    for key, value in update_data.items():
-        setattr(leave, key, value)
+    # ==========================================
+    # Update Normal Fields
+    # ==========================================
 
-    if leave.FromDate and leave.ToDate:
-        leave.TotalDays = float(
-            (leave.ToDate - leave.FromDate).days + 1
-        )
+    for key in [
+        "LeaveType",
+        "FromDate",
+        "ToDate",
+        "Reason",
+    ]:
+        if key in update_data:
+            setattr(
+                leave,
+                key,
+                update_data[key],
+            )
+
+    # ==========================================
+    # Determine Leave Duration
+    # ==========================================
+
+    leave_duration = update_data.get(
+        "LeaveDuration"
+    )
+
+    half_day_session = update_data.get(
+        "HalfDaySession"
+    )
+
+    if leave_duration == "Half Day":
+
+        if not leave.FromDate or not leave.ToDate:
+            raise HTTPException(
+                status_code=400,
+                detail="From Date and To Date are required",
+            )
+
+        if leave.ToDate != leave.FromDate:
+            raise HTTPException(
+                status_code=400,
+                detail="Half Day leave can only be for one day",
+            )
+
+        if half_day_session not in [
+            "First Half",
+            "Second Half",
+        ]:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Please select First Half or Second Half "
+                    "for Half Day leave"
+                ),
+            )
+
+        leave.TotalDays = 0.5
+        leave.HalfDaySession = half_day_session
+
+    else:
+
+        # Full Day
+        if leave.FromDate and leave.ToDate:
+
+            if leave.ToDate < leave.FromDate:
+                raise HTTPException(
+                    status_code=400,
+                    detail="To Date cannot be before From Date",
+                )
+
+            leave.TotalDays = float(
+                (leave.ToDate - leave.FromDate).days + 1
+            )
+
+        leave.HalfDaySession = None
 
     db.commit()
     db.refresh(leave)
@@ -206,7 +332,9 @@ def delete_leave(
 
     leave = (
         db.query(Leave)
-        .filter(Leave.LeaveID == UUID(leave_id))
+        .filter(
+            Leave.LeaveID == UUID(leave_id)
+        )
         .first()
     )
 

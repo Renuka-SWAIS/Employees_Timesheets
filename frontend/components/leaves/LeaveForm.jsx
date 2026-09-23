@@ -1,3 +1,4 @@
+```jsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,6 +8,8 @@ const initialState = {
   FromDate: "",
   ToDate: "",
   LeaveType: "Casual Leave",
+  LeaveDuration: "Full Day",
+  HalfDaySession: "",
   Reason: "",
 };
 
@@ -22,6 +25,10 @@ export default function LeaveForm({
 
   useEffect(() => {
     if (editData) {
+      const isHalfDay =
+        editData.LeaveDuration === "Half Day" ||
+        Number(editData.TotalDays) === 0.5;
+
       setForm({
         EmployeeID: editData.EmployeeID || "",
         FromDate: editData.FromDate
@@ -31,6 +38,10 @@ export default function LeaveForm({
           ? editData.ToDate.split("T")[0]
           : "",
         LeaveType: editData.LeaveType || "Casual Leave",
+        LeaveDuration: isHalfDay ? "Half Day" : "Full Day",
+        HalfDaySession: isHalfDay
+          ? editData.HalfDaySession || ""
+          : "",
         Reason: editData.Reason || "",
       });
     } else {
@@ -43,10 +54,29 @@ export default function LeaveForm({
   function handleChange(e) {
     const { name, value } = e.target;
 
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => {
+      const updated = {
+        ...prev,
+        [name]: value,
+      };
+
+      // Half Day must always be one date.
+      if (name === "LeaveDuration" && value === "Half Day") {
+        updated.ToDate = updated.FromDate;
+      }
+
+      if (name === "LeaveDuration" && value === "Full Day") {
+        updated.HalfDaySession = "";
+      }
+
+      // If From Date changes while Half Day is selected,
+      // keep To Date the same.
+      if (name === "FromDate" && prev.LeaveDuration === "Half Day") {
+        updated.ToDate = value;
+      }
+
+      return updated;
+    });
   }
 
   function handleSubmit(e) {
@@ -72,6 +102,21 @@ export default function LeaveForm({
       return;
     }
 
+    if (form.LeaveDuration === "Half Day") {
+      if (form.FromDate !== form.ToDate) {
+        alert("Half Day leave can only be for one day.");
+        return;
+      }
+
+      if (
+        form.HalfDaySession !== "First Half" &&
+        form.HalfDaySession !== "Second Half"
+      ) {
+        alert("Please select First Half or Second Half.");
+        return;
+      }
+    }
+
     if (!form.Reason.trim()) {
       alert("Reason is required");
       return;
@@ -82,6 +127,11 @@ export default function LeaveForm({
       FromDate: form.FromDate,
       ToDate: form.ToDate,
       LeaveType: form.LeaveType,
+      LeaveDuration: form.LeaveDuration,
+      HalfDaySession:
+        form.LeaveDuration === "Half Day"
+          ? form.HalfDaySession
+          : null,
       Reason: form.Reason,
     });
   }
@@ -122,11 +172,7 @@ export default function LeaveForm({
         </h2>
 
         <form onSubmit={handleSubmit}>
-
-          {/* ============================= */}
           {/* Employee - Admin Only */}
-          {/* ============================= */}
-
           {isAdmin && (
             <>
               <label
@@ -146,9 +192,7 @@ export default function LeaveForm({
                 style={inputStyle}
                 required
               >
-                <option value="">
-                  Select Employee
-                </option>
+                <option value="">Select Employee</option>
 
                 {employees.map((emp) => (
                   <option
@@ -162,10 +206,55 @@ export default function LeaveForm({
             </>
           )}
 
-          {/* ============================= */}
-          {/* From Date */}
-          {/* ============================= */}
+          {/* Leave Duration */}
+          <label
+            style={{
+              fontWeight: "600",
+              display: "block",
+              marginBottom: "6px",
+            }}
+          >
+            Leave Duration
+          </label>
 
+          <select
+            name="LeaveDuration"
+            value={form.LeaveDuration}
+            onChange={handleChange}
+            style={inputStyle}
+          >
+            <option value="Full Day">Full Day</option>
+            <option value="Half Day">Half Day</option>
+          </select>
+
+          {/* Half Day Session */}
+          {form.LeaveDuration === "Half Day" && (
+            <>
+              <label
+                style={{
+                  fontWeight: "600",
+                  display: "block",
+                  marginBottom: "6px",
+                }}
+              >
+                Half Day Session
+              </label>
+
+              <select
+                name="HalfDaySession"
+                value={form.HalfDaySession}
+                onChange={handleChange}
+                style={inputStyle}
+                required
+              >
+                <option value="">Select Session</option>
+                <option value="First Half">First Half</option>
+                <option value="Second Half">Second Half</option>
+              </select>
+            </>
+          )}
+
+          {/* From Date */}
           <label
             style={{
               fontWeight: "600",
@@ -185,10 +274,7 @@ export default function LeaveForm({
             required
           />
 
-          {/* ============================= */}
           {/* To Date */}
-          {/* ============================= */}
-
           <label
             style={{
               fontWeight: "600",
@@ -204,14 +290,21 @@ export default function LeaveForm({
             name="ToDate"
             value={form.ToDate}
             onChange={handleChange}
-            style={inputStyle}
+            style={{
+              ...inputStyle,
+              ...(form.LeaveDuration === "Half Day"
+                ? {
+                    background: "#f3f4f6",
+                    cursor: "not-allowed",
+                  }
+                : {}),
+            }}
+            min={form.FromDate || undefined}
+            disabled={form.LeaveDuration === "Half Day"}
             required
           />
 
-          {/* ============================= */}
           {/* Leave Type */}
-          {/* ============================= */}
-
           <label
             style={{
               fontWeight: "600",
@@ -236,10 +329,7 @@ export default function LeaveForm({
             <option>Other</option>
           </select>
 
-          {/* ============================= */}
           {/* Reason */}
-          {/* ============================= */}
-
           <label
             style={{
               fontWeight: "600",
@@ -260,10 +350,7 @@ export default function LeaveForm({
             required
           />
 
-          {/* ============================= */}
           {/* Buttons */}
-          {/* ============================= */}
-
           <div
             style={{
               display: "flex",
@@ -290,7 +377,6 @@ export default function LeaveForm({
               {editData ? "Update" : "Apply"}
             </button>
           </div>
-
         </form>
       </div>
     </div>
@@ -327,3 +413,4 @@ const cancelBtn = {
   cursor: "pointer",
   fontWeight: "600",
 };
+```

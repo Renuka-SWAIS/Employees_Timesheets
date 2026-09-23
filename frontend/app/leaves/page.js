@@ -1,3 +1,4 @@
+```jsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -240,6 +241,7 @@ export default function LeavesPage() {
             <th style={thStyle}>From Date</th>
             <th style={thStyle}>To Date</th>
             <th style={thStyle}>Leave Type</th>
+            <th style={thStyle}>Duration</th>
             <th style={thStyle}>Total Days</th>
             <th style={thStyle}>Reason</th>
             <th style={thStyle}>Actions</th>
@@ -249,13 +251,12 @@ export default function LeavesPage() {
         </thead>
 
         <tbody>
-        
-        
-                  {loading ? (
+
+          {loading ? (
 
             <tr>
               <td
-                colSpan={isAdmin ? 7 : 6}
+                colSpan={isAdmin ? 8 : 7}
                 style={tdStyle}
               >
                 Loading...
@@ -266,7 +267,7 @@ export default function LeavesPage() {
 
             <tr>
               <td
-                colSpan={isAdmin ? 7 : 6}
+                colSpan={isAdmin ? 8 : 7}
                 style={tdStyle}
               >
                 No Leave Records
@@ -275,87 +276,125 @@ export default function LeavesPage() {
 
           ) : (
 
-            leaves.map((leave) => (
+            leaves.map((leave) => {
 
-              <tr key={leave.LeaveID}>
+              const isHalfDay =
+                leave.LeaveDuration === "Half Day" ||
+                Number(leave.TotalDays) === 0.5;
 
-                {isAdmin && (
+              return (
+
+                <tr key={leave.LeaveID}>
+
+                  {isAdmin && (
+                    <td style={tdStyle}>
+                      <div style={{ fontWeight: "600" }}>
+                        {leave.EmployeeName}
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#6b7280",
+                        }}
+                      >
+                        {leave.EmployeeCode}
+                      </div>
+                    </td>
+                  )}
+
                   <td style={tdStyle}>
-                    <div style={{fontWeight:"600"}}>
-                      {leave.EmployeeName}
-                    </div>
+                    {leave.FromDate}
+                  </td>
+
+                  <td style={tdStyle}>
+                    {leave.ToDate}
+                  </td>
+
+                  <td style={tdStyle}>
+                    {leave.LeaveType}
+                  </td>
+
+                  <td style={tdStyle}>
+
                     <div
                       style={{
-                        fontSize:"12px",
-                        color:"#6b7280",
+                        fontWeight: "600",
                       }}
                     >
-                      {leave.EmployeeCode}
+                      {isHalfDay
+                        ? "Half Day"
+                        : "Full Day"}
                     </div>
+
+                    {isHalfDay &&
+                      leave.HalfDaySession && (
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#6b7280",
+                            marginTop: "3px",
+                          }}
+                        >
+                          {leave.HalfDaySession}
+                        </div>
+                      )}
+
                   </td>
-                )}
 
-                <td style={tdStyle}>
-                  {leave.FromDate}
-                </td>
+                  <td style={tdStyle}>
+                    {Number(leave.TotalDays) === 0.5
+                      ? "0.5"
+                      : leave.TotalDays}
+                  </td>
 
-                <td style={tdStyle}>
-                  {leave.ToDate}
-                </td>
+                  <td style={tdStyle}>
+                    {leave.Reason}
+                  </td>
 
-                <td style={tdStyle}>
-                  {leave.LeaveType}
-                </td>
+                  <td style={tdStyle}>
 
-                <td style={tdStyle}>
-                  {leave.TotalDays}
-                </td>
+                    <button
+                      onClick={() => {
+                        setSelected(leave);
+                        setShowForm(true);
+                      }}
+                      style={{
+                        background: "#2563eb",
+                        color: "#fff",
+                        border: "none",
+                        padding: "6px 12px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        marginRight: "8px",
+                      }}
+                    >
+                      Edit
+                    </button>
 
-                <td style={tdStyle}>
-                  {leave.Reason}
-                </td>
+                    <button
+                      onClick={() =>
+                        handleDelete(leave.LeaveID)
+                      }
+                      style={{
+                        background: "#dc2626",
+                        color: "#fff",
+                        border: "none",
+                        padding: "6px 12px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Delete
+                    </button>
 
-                <td style={tdStyle}>
+                  </td>
 
-                  <button
-                    onClick={() => {
-                      setSelected(leave);
-                      setShowForm(true);
-                    }}
-                    style={{
-                      background:"#2563eb",
-                      color:"#fff",
-                      border:"none",
-                      padding:"6px 12px",
-                      borderRadius:"6px",
-                      cursor:"pointer",
-                      marginRight:"8px",
-                    }}
-                  >
-                    Edit
-                  </button>
+                </tr>
 
-                  <button
-                    onClick={() =>
-                      handleDelete(leave.LeaveID)
-                    }
-                    style={{
-                      background:"#dc2626",
-                      color:"#fff",
-                      border:"none",
-                      padding:"6px 12px",
-                      borderRadius:"6px",
-                      cursor:"pointer",
-                    }}
-                  >
-                    Delete
-                  </button>
+              );
 
-                </td>
-
-              </tr>
-
-            ))
+            })
 
           )}
 
@@ -390,3 +429,4 @@ const tdStyle = {
   padding: "14px",
   borderBottom: "1px solid #e5e7eb",
 };
+```
