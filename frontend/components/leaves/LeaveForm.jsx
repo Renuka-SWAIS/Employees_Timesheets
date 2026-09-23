@@ -1,4 +1,4 @@
-```jsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -413,4 +413,4 @@ const cancelBtn = {
   cursor: "pointer",
   fontWeight: "600",
 };
-```
+export default LeaveForm;

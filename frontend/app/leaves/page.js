@@ -1,4 +1,4 @@
-```jsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -429,4 +429,4 @@ const tdStyle = {
   padding: "14px",
   borderBottom: "1px solid #e5e7eb",
 };
-```
+
