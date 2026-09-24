@@ -18,18 +18,23 @@ export default function EmployeeTable({
 
   return (
     <div
-      style={{
-        background: "#fff",
-        borderRadius: "12px",
-        overflow: "hidden",
-      }}
-    >
+  style={{
+    background: "#fff",
+    borderRadius: "12px",
+    width: "100%",
+    maxWidth: "100%",
+    overflowX: "auto",
+    overflowY: "hidden",
+    WebkitOverflowScrolling: "touch",
+  }}
+>
       <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-        }}
-      >
+  style={{
+    width: "100%",
+    minWidth: "900px",
+    borderCollapse: "collapse",
+  }}
+>
         <thead>
           <tr style={{ background: "#2563eb", color: "#fff" }}>
             <th style={th}>Code</th>
