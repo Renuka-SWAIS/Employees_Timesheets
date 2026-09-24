@@ -242,7 +242,7 @@ if (!isAdmin) {
 
           justifyContent: "center",
 
-          padding: "12px",
+          padding: "8px",
 
           boxSizing: "border-box",
 
@@ -259,14 +259,12 @@ if (!isAdmin) {
             2. Scrollable Form
             3. Fixed Footer
         ========================================= */}
-        <div
-        className="timesheet-modal"
-          style={{
-            position: "relative",
-
-            width: "600px",
-
-            maxWidth: "100%",
+      <div
+  className="timesheet-modal"
+  style={{
+    position: "relative",
+    width: "600px",
+    maxWidth: "100%",
 
             height: "calc(100dvh - 24px)",
 
@@ -599,7 +597,7 @@ if (!isAdmin) {
 
               gap: "10px",
 
-              padding: "10px 30px",
+              padding: "10px 20px",
 
               borderTop:
                 "1px solid #e5e7eb",

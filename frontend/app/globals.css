@@ -366,7 +366,8 @@ th {
 
     overflow: hidden;
   }
-/* ==========================
+
+  /* ==========================
    MOBILE RESPONSIVE
 ========================== */
 
@@ -941,4 +942,89 @@ th {
     font-size: 5.5px;
 
     line-height: 1.05;
-  }}}
+  }
+}
+
+
+/* ==========================
+   TIMESHEET MODAL - MOBILE
+========================== */
+
+@media (max-width: 768px) {
+
+  .timesheet-modal {
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    height: calc(100dvh - 16px) !important;
+
+    max-height: calc(100dvh - 16px) !important;
+
+    border-radius: 10px !important;
+  }
+
+  .timesheet-modal-body {
+    padding: 14px 16px 20px 16px !important;
+  }
+}
+
+
+/* ==========================
+   TIMESHEET MODAL - SMALL MOBILE
+========================== */
+
+@media (max-width: 480px) {
+
+  .timesheet-modal {
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    height: calc(100dvh - 10px) !important;
+
+    max-height: calc(100dvh - 10px) !important;
+
+    border-radius: 8px !important;
+  }
+
+  .timesheet-modal-body {
+    padding: 12px 14px 18px 14px !important;
+  }
+}
+
+/* =========================================
+   TIMESHEET MODAL - MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+  .timesheet-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: calc(100dvh - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+    border-radius: 10px !important;
+  }
+
+  .timesheet-modal-body {
+    padding: 14px 16px 20px 16px !important;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+  .timesheet-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: calc(100dvh - 10px) !important;
+    max-height: calc(100dvh - 10px) !important;
+    border-radius: 8px !important;
+  }
+
+  .timesheet-modal-body {
+    padding: 12px 14px 18px 14px !important;
+  }
+}}
