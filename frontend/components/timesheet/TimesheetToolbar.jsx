@@ -1,3 +1,4 @@
+
 "use client";
 
 import MonthSelector from "./MonthSelector";
@@ -11,34 +12,11 @@ export default function TimesheetToolbar({
   onAdd,
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "25px",
-        gap: "15px",
-        flexWrap: "wrap",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          gap: "15px",
-          alignItems: "center",
-        }}
-      >
+    <div className="timesheet-toolbar">
+      <div className="timesheet-toolbar-left">
         <button
           onClick={onAdd}
-          style={{
-            padding: "10px 18px",
-            border: "none",
-            borderRadius: "8px",
-            background: "#2563eb",
-            color: "#fff",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
+          className="timesheet-add-btn"
         >
           + Add Entry
         </button>
@@ -49,37 +27,18 @@ export default function TimesheetToolbar({
         />
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          alignItems: "center",
-        }}
-      >
+      <div className="timesheet-toolbar-right">
         <input
           type="text"
           placeholder="Search project..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{
-            padding: "10px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-            width: "220px",
-          }}
+          className="timesheet-search"
         />
 
         <button
           onClick={onRefresh}
-          style={{
-            padding: "10px 18px",
-            border: "none",
-            borderRadius: "8px",
-            background: "#16a34a",
-            color: "white",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
+          className="timesheet-refresh-btn"
         >
           Refresh
         </button>
@@ -87,3 +46,4 @@ export default function TimesheetToolbar({
     </div>
   );
 }
+

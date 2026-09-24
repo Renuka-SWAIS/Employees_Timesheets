@@ -1,5 +1,8 @@
+
 "use client";
+
 import React from "react";
+
 export default function TimesheetTable({
   timesheets = [],
   loading,
@@ -77,261 +80,242 @@ export default function TimesheetTable({
   const columnCount = readOnly ? 6 : 7;
 
   return (
-    <div className="tableCard">
-      <h2 style={{ marginBottom: "20px" }}>
+    <div className="tableCard timesheet-table-card">
+      <h2
+        style={{
+          marginBottom: "20px",
+        }}
+      >
         Timesheet Entries
       </h2>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Project</th>
-            <th>Task Description</th>
-            <th>Hours</th>
-            <th>Remarks</th>
-<th>Entered By</th>
-            {!readOnly && <th>Actions</th>}
-          </tr>
-        </thead>
+      <div className="timesheet-table-wrapper">
+        <table className="timesheet-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Project</th>
+              <th>Task Description</th>
+              <th>Hours</th>
+              <th>Remarks</th>
+              <th>Entered By</th>
+              {!readOnly && <th>Actions</th>}
+            </tr>
+          </thead>
 
-        <tbody>
-          {Object.entries(groupedTimesheets).map(
-            ([dateKey, entries]) => {
-              const formattedDate =
-                formatDate(dateKey);
+          <tbody>
+            {Object.entries(groupedTimesheets).map(
+              ([dateKey, entries]) => {
+                const formattedDate =
+                  formatDate(dateKey);
 
-              const totalHours =
-                getTotalHours(entries);
+                const totalHours =
+                  getTotalHours(entries);
 
-              return (
-                <React.Fragment key={dateKey}>
-                  {/* ==========================
-                      DATE GROUP HEADER
-                  ========================== */}
-                  <tr>
-                    <td
-                      colSpan={columnCount}
-                      style={{
-                        background: "#eff6ff",
-                        borderTop:
-                          "3px solid #2563eb",
-                        borderBottom:
-                          "1px solid #bfdbfe",
-                        padding: "14px 16px",
-                        fontWeight: "600",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent:
-                            "space-between",
-                          alignItems: "center",
-                          gap: "15px",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        {/* Date + Day */}
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: "20px",
-                            }}
-                          >
-                            📅
-                          </span>
-
-                          <div>
-                            <div
-                              style={{
-                                color: "#1e3a8a",
-                                fontSize: "16px",
-                                fontWeight: "700",
-                              }}
-                            >
-                              {formattedDate.date}
-                            </div>
-
-                            <div
-                              style={{
-                                color: "#64748b",
-                                fontSize: "13px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              {formattedDate.day}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Entry Count + Total */}
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <span
-                            style={{
-                              background: "#dbeafe",
-                              color: "#1d4ed8",
-                              padding:
-                                "6px 12px",
-                              borderRadius: "20px",
-                              fontSize: "13px",
-                              fontWeight: "600",
-                              whiteSpace:
-                                "nowrap",
-                            }}
-                          >
-                            {entries.length}{" "}
-                            {entries.length === 1
-                              ? "Entry"
-                              : "Entries"}
-                          </span>
-
-                          <span
-                            style={{
-                              background: "#dcfce7",
-                              color: "#15803d",
-                              padding:
-                                "6px 12px",
-                              borderRadius: "20px",
-                              fontSize: "13px",
-                              fontWeight: "600",
-                              whiteSpace:
-                                "nowrap",
-                            }}
-                          >
-                            Total: {totalHours} hrs
-                          </span>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-
-                  {/* ==========================
-                      ENTRIES FOR THIS DATE
-                  ========================== */}
-                  {entries.map((item) => (
-                    <tr key={item.EntryID}>
-                      {/* Date */}
-                      <td>
-                        <div
-                          style={{
-                            fontWeight: "600",
-                          }}
-                        >
-                          {formattedDate.date}
-                        </div>
-
-                        <div
-                          style={{
-                            fontSize: "12px",
-                            color: "#64748b",
-                            marginTop: "4px",
-                          }}
-                        >
-                          {formattedDate.day}
-                        </div>
-                      </td>
-
-                      {/* Project */}
-                      <td>
-                        {item.Project || "-"}
-                      </td>
-
-                      {/* Task Description */}
-                      <td>
-                        {item.TaskDescription || "-"}
-                      </td>
-
-                      {/* Hours */}
+                return (
+                  <React.Fragment key={dateKey}>
+                    {/* DATE GROUP HEADER */}
+                    <tr>
                       <td
+                        colSpan={columnCount}
                         style={{
+                          background: "#eff6ff",
+                          borderTop:
+                            "3px solid #2563eb",
+                          borderBottom:
+                            "1px solid #bfdbfe",
+                          padding: "14px 16px",
                           fontWeight: "600",
                         }}
                       >
-                        {item.HoursWorked ?? "-"}
-                      </td>
-
-                      {/* Remarks */}
-                     <td>
-  {item.Remarks || "-"}
-</td>
-
-<td>
-  {item.EnteredBy || item.CreatedBy || "-"}
-</td>
-
-{!readOnly && (
-                        <td>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent:
+                              "space-between",
+                            alignItems: "center",
+                            gap: "15px",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {/* Date + Day */}
                           <div
                             style={{
                               display: "flex",
+                              alignItems: "center",
+                              gap: "10px",
+                              minWidth: 0,
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: "20px",
+                                flexShrink: 0,
+                              }}
+                            >
+                              📅
+                            </span>
+
+                            <div
+                              style={{
+                                minWidth: 0,
+                              }}
+                            >
+                              <div
+                                style={{
+                                  color: "#1e3a8a",
+                                  fontSize: "16px",
+                                  fontWeight: "700",
+                                }}
+                              >
+                                {formattedDate.date}
+                              </div>
+
+                              <div
+                                style={{
+                                  color: "#64748b",
+                                  fontSize: "13px",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                {formattedDate.day}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Entry Count + Total */}
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
                               gap: "10px",
                               flexWrap: "wrap",
                             }}
                           >
-                            <button
-                              onClick={() =>
-                                onEdit(item)
-                              }
+                            <span
                               style={{
-                                background:
-                                  "#2563eb",
-                                color: "#fff",
-                                border: "none",
-                                padding:
-                                  "8px 14px",
-                                borderRadius:
-                                  "6px",
-                                cursor:
-                                  "pointer",
+                                background: "#dbeafe",
+                                color: "#1d4ed8",
+                                padding: "6px 12px",
+                                borderRadius: "20px",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                whiteSpace: "nowrap",
                               }}
                             >
-                              Edit
-                            </button>
+                              {entries.length}{" "}
+                              {entries.length === 1
+                                ? "Entry"
+                                : "Entries"}
+                            </span>
 
-                            <button
-                              onClick={() =>
-                                onDelete(item)
-                              }
+                            <span
                               style={{
-                                background:
-                                  "#dc2626",
-                                color: "#fff",
-                                border: "none",
-                                padding:
-                                  "8px 14px",
-                                borderRadius:
-                                  "6px",
-                                cursor:
-                                  "pointer",
+                                background: "#dcfce7",
+                                color: "#15803d",
+                                padding: "6px 12px",
+                                borderRadius: "20px",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                whiteSpace: "nowrap",
                               }}
                             >
-                              Delete
-                            </button>
+                              Total: {totalHours} hrs
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* ENTRIES */}
+                    {entries.map((item) => (
+                      <tr key={item.EntryID}>
+                        {/* Date */}
+                        <td>
+                          <div
+                            style={{
+                              fontWeight: "600",
+                            }}
+                          >
+                            {formattedDate.date}
+                          </div>
+
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              color: "#64748b",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {formattedDate.day}
                           </div>
                         </td>
-                      )}
-                    </tr>
-                  ))}
-                </React.Fragment>
-              );
-            }
-          )}
-        </tbody>
-      </table>
+
+                        {/* Project */}
+                        <td>
+                          {item.Project || "-"}
+                        </td>
+
+                        {/* Task Description */}
+                        <td>
+                          {item.TaskDescription || "-"}
+                        </td>
+
+                        {/* Hours */}
+                        <td
+                          style={{
+                            fontWeight: "600",
+                          }}
+                        >
+                          {item.HoursWorked ?? "-"}
+                        </td>
+
+                        {/* Remarks */}
+                        <td>
+                          {item.Remarks || "-"}
+                        </td>
+
+                        {/* Entered By */}
+                        <td>
+                          {item.EnteredBy ||
+                            item.CreatedBy ||
+                            "-"}
+                        </td>
+
+                        {/* Actions */}
+                        {!readOnly && (
+                          <td>
+                            <div className="timesheet-actions">
+                              <button
+                                onClick={() =>
+                                  onEdit(item)
+                                }
+                                className="timesheet-edit-btn"
+                              >
+                                Edit
+                              </button>
+
+                              <button
+                                onClick={() =>
+                                  onDelete(item)
+                                }
+                                className="timesheet-delete-btn"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                );
+              }
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
+

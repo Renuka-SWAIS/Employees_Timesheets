@@ -1050,3 +1050,267 @@ th {
     font-size: 14px !important;
   }
 }
+/* =========================================
+   TIMESHEET TOOLBAR
+========================================= */
+
+.timesheet-toolbar {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+}
+
+.timesheet-toolbar-left,
+.timesheet-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.timesheet-add-btn,
+.timesheet-refresh-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.timesheet-add-btn {
+  background: #2563eb;
+}
+
+.timesheet-refresh-btn {
+  background: #16a34a;
+}
+
+.timesheet-search {
+  width: 220px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+  .timesheet-toolbar {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .timesheet-toolbar-left,
+  .timesheet-toolbar-right {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    display: flex;
+    gap: 6px;
+    box-sizing: border-box;
+  }
+
+  .timesheet-toolbar-left > *,
+  .timesheet-toolbar-right > * {
+    min-width: 0;
+  }
+
+  .timesheet-add-btn,
+  .timesheet-refresh-btn {
+    padding: 8px 10px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .timesheet-search {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .timesheet-toolbar {
+    gap: 6px;
+  }
+
+  .timesheet-toolbar-left,
+  .timesheet-toolbar-right {
+    gap: 4px;
+  }
+
+  .timesheet-add-btn,
+  .timesheet-refresh-btn {
+    padding: 7px 8px;
+    font-size: 10px;
+  }
+
+  .timesheet-search {
+    font-size: 11px;
+    padding: 7px;
+  }
+}
+
+/* =========================================
+   TIMESHEET TABLE
+========================================= */
+
+.timesheet-table-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.timesheet-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.timesheet-table {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.timesheet-table th,
+.timesheet-table td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Actions */
+.timesheet-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.timesheet-edit-btn,
+.timesheet-delete-btn {
+  border: none;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.timesheet-edit-btn {
+  background: #2563eb;
+}
+
+.timesheet-delete-btn {
+  background: #dc2626;
+}
+
+/* =========================================
+   MOBILE TIMESHEET TABLE
+========================================= */
+
+@media (max-width: 768px) {
+  .timesheet-table-card {
+    padding: 5px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .timesheet-table-card h2 {
+    font-size: 12px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .timesheet-table-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .timesheet-table {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .timesheet-table th,
+  .timesheet-table td {
+    padding: 3px 2px !important;
+    font-size: 6px !important;
+    line-height: 1.1 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    max-width: 0 !important;
+  }
+
+  .timesheet-table th {
+    font-size: 6px !important;
+  }
+
+  .timesheet-table td div {
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .timesheet-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 100%;
+  }
+
+  .timesheet-edit-btn,
+  .timesheet-delete-btn {
+    width: 100%;
+    padding: 4px 2px;
+    font-size: 6px;
+    line-height: 1.1;
+  }
+}
+
+@media (max-width: 360px) {
+  .timesheet-table th,
+  .timesheet-table td {
+    padding: 2px 1px !important;
+    font-size: 5px !important;
+  }
+
+  .timesheet-table th {
+    font-size: 5px !important;
+  }
+
+  .timesheet-edit-btn,
+  .timesheet-delete-btn {
+    padding: 3px 1px;
+    font-size: 5px;
+  }
+}
