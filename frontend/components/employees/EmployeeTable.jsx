@@ -1,3 +1,4 @@
+
 "use client";
 
 export default function EmployeeTable({
@@ -17,26 +18,10 @@ export default function EmployeeTable({
   }
 
   return (
-    <div
-  style={{
-    background: "#fff",
-    borderRadius: "12px",
-    width: "100%",
-    maxWidth: "100%",
-    overflowX: "auto",
-    overflowY: "hidden",
-    WebkitOverflowScrolling: "touch",
-  }}
->
-      <table
-  style={{
-    width: "100%",
-    minWidth: "900px",
-    borderCollapse: "collapse",
-  }}
->
+    <div className="employee-table-card">
+      <table className="employee-table">
         <thead>
-          <tr style={{ background: "#2563eb", color: "#fff" }}>
+          <tr>
             <th style={th}>Code</th>
             <th style={th}>Name</th>
             <th style={th}>Email</th>
@@ -85,14 +70,11 @@ export default function EmployeeTable({
                 </span>
               </td>
 
-              <td style={td}>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "8px",
-                    flexWrap: "wrap",
-                  }}
-                >
+              <td
+                className="employee-actions-cell"
+                style={td}
+              >
+                <div className="employee-action-buttons">
                   <button
                     style={viewBtn}
                     onClick={() => onViewEmployee(emp)}
@@ -190,3 +172,4 @@ const deleteBtn = {
   borderRadius: "6px",
   cursor: "pointer",
 };
+
