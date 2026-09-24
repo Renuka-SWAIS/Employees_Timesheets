@@ -260,6 +260,7 @@ if (!isAdmin) {
             3. Fixed Footer
         ========================================= */}
         <div
+        className="timesheet-modal"
           style={{
             position: "relative",
 
@@ -330,6 +331,7 @@ if (!isAdmin) {
               SCROLLABLE FORM SECTION
           ========================================= */}
           <div
+          className="timesheet-modal-body"
             style={{
               minHeight: 0,
 
