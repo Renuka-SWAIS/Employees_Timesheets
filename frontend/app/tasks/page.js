@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -103,10 +104,10 @@ export default function TasksPage() {
         >
           + Add Task
         </button>
-
       </div>
 
       <table
+        className="tasks-table"
         style={{
           width: "100%",
           borderCollapse: "collapse",
@@ -122,7 +123,6 @@ export default function TasksPage() {
           }}
         >
           <tr>
-
             <th style={thStyle}>Task ID</th>
 
             <th style={thStyle}>Task Name</th>
@@ -135,18 +135,14 @@ export default function TasksPage() {
 
             <th style={thStyle}>Hours Spent</th>
 
-<th style={thStyle}>Remaining Hours</th>
+            <th style={thStyle}>Remaining Hours</th>
 
             <th style={thStyle}>Actions</th>
-
           </tr>
         </thead>
 
         <tbody>
-
-
-                 {loading ? (
-
+          {loading ? (
             <tr>
               <td
                 colSpan={8}
@@ -155,22 +151,17 @@ export default function TasksPage() {
                 No Tasks Found
               </td>
             </tr>
-
           ) : tasks.length === 0 ? (
-
             <tr>
               <td
-                colSpan={6}
+                colSpan={8}
                 style={tdStyle}
               >
                 No Tasks Found
               </td>
             </tr>
-
           ) : (
-
             tasks.map((task) => (
-
               <tr key={task.TaskID}>
 
                 <td style={tdStyle}>
@@ -192,16 +183,19 @@ export default function TasksPage() {
                 <td style={tdStyle}>
                   {task.ApprovedHours}
                 </td>
-                 <td style={tdStyle}>
-  {task.HoursSpent}
-</td>
-
-<td style={tdStyle}>
-  {task.RemainingHours}
-</td>
 
                 <td style={tdStyle}>
+                  {task.HoursSpent}
+                </td>
 
+                <td style={tdStyle}>
+                  {task.RemainingHours}
+                </td>
+
+                <td
+                  className="tasks-actions-cell"
+                  style={tdStyle}
+                >
                   <button
                     onClick={() => {
                       setSelected(task);
@@ -235,17 +229,12 @@ export default function TasksPage() {
                   >
                     Delete
                   </button>
-
                 </td>
 
               </tr>
-
             ))
-
           )}
-
         </tbody>
-
       </table>
 
       <TaskForm
@@ -259,9 +248,7 @@ export default function TasksPage() {
       />
 
     </MainLayout>
-
   );
-
 }
 
 const thStyle = {
@@ -273,3 +260,4 @@ const tdStyle = {
   padding: "14px",
   borderBottom: "1px solid #e5e7eb",
 };
+

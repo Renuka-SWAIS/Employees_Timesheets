@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -101,7 +102,6 @@ export default function SettingsPage() {
       console.error("Photo upload error:", error);
       alert(error.message || "Photo upload failed");
     } finally {
-      // Allow selecting the same file again
       event.target.value = "";
     }
   }
@@ -171,6 +171,7 @@ export default function SettingsPage() {
     return (
       <MainLayout>
         <div
+          className="settings-message"
           style={{
             padding: 40,
             textAlign: "center",
@@ -189,6 +190,7 @@ export default function SettingsPage() {
     return (
       <MainLayout>
         <div
+          className="settings-message"
           style={{
             padding: 40,
             textAlign: "center",
@@ -205,43 +207,21 @@ export default function SettingsPage() {
   // ==============================
   return (
     <MainLayout>
-      <div
-        style={{
-          padding: 30,
-        }}
-      >
+      <div className="settings-page">
+
         <h1>
           ⚙️ {isAdmin ? "Admin Profile" : "Employee Profile"}
         </h1>
 
-        <p
-          style={{
-            color: "#666",
-            marginBottom: 30,
-          }}
-        >
+        <p className="settings-description">
           Manage your profile information.
         </p>
 
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: 15,
-            padding: 35,
-            maxWidth: 700,
-            margin: "auto",
-            boxShadow: "0 4px 12px rgba(0,0,0,.08)",
-          }}
-        >
+        <div className="settings-profile-card">
+
           {/* Profile Header */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 25,
-              marginBottom: 35,
-            }}
-          >
+          <div className="settings-profile-header">
+
             <img
               src={
                 profile.PhotoURL
@@ -253,16 +233,11 @@ export default function SettingsPage() {
                     )}`
               }
               alt="profile"
-              style={{
-                width: 120,
-                height: 120,
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: "4px solid #2563eb",
-              }}
+              className="settings-profile-photo"
             />
 
-            <div>
+            <div className="settings-profile-info">
+
               <h2>
                 {profile.EmployeeName || profile.Name}
               </h2>
@@ -273,84 +248,78 @@ export default function SettingsPage() {
                   "-"}
               </p>
 
-              <span
-                style={{
-                  background: "#dcfce7",
-                  padding: "6px 15px",
-                  borderRadius: 20,
-                  fontWeight: 600,
-                }}
-              >
+              <span className="settings-status">
                 {profile.Status || "Active"}
               </span>
+
             </div>
+
           </div>
 
           {/* Profile Information */}
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-            }}
-          >
-            <tbody>
-              {!isAdmin && (
+          <div className="settings-info-wrapper">
+            <table className="settings-info-table">
+              <tbody>
+
+                {!isAdmin && (
+                  <tr>
+                    <td>
+                      <b>Employee Code</b>
+                    </td>
+
+                    <td>
+                      {profile.EmployeeCode || "-"}
+                    </td>
+                  </tr>
+                )}
+
                 <tr>
                   <td>
-                    <b>Employee Code</b>
+                    <b>Email</b>
                   </td>
 
                   <td>
-                    {profile.EmployeeCode || "-"}
+                    {profile.EmailID ||
+                      profile.Email ||
+                      "-"}
                   </td>
                 </tr>
-              )}
 
-              <tr>
-                <td>
-                  <b>Email</b>
-                </td>
+                <tr>
+                  <td>
+                    <b>Department</b>
+                  </td>
 
-                <td>
-                  {profile.EmailID ||
-                    profile.Email ||
-                    "-"}
-                </td>
-              </tr>
+                  <td>
+                    {profile.Department || "-"}
+                  </td>
+                </tr>
 
-              <tr>
-                <td>
-                  <b>Department</b>
-                </td>
+                <tr>
+                  <td>
+                    <b>Designation</b>
+                  </td>
 
-                <td>
-                  {profile.Department || "-"}
-                </td>
-              </tr>
+                  <td>
+                    {profile.Designation || "-"}
+                  </td>
+                </tr>
 
-              <tr>
-                <td>
-                  <b>Designation</b>
-                </td>
+                <tr>
+                  <td>
+                    <b>Role</b>
+                  </td>
 
-                <td>
-                  {profile.Designation || "-"}
-                </td>
-              </tr>
+                  <td>
+                    {profile.RoleType ||
+                      profile.Role ||
+                      "-"}
+                  </td>
+                </tr>
 
-              <tr>
-                <td>
-                  <b>Role</b>
-                </td>
-
-                <td>
-                  {profile.RoleType ||
-                    profile.Role ||
-                    "-"}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
 
           {/* Hidden Photo Input */}
           <input
@@ -364,43 +333,26 @@ export default function SettingsPage() {
           />
 
           {/* Action Buttons */}
-          <div
-            style={{
-              display: "flex",
-              gap: 15,
-              marginTop: 35,
-            }}
-          >
+          <div className="settings-action-buttons">
+
             <button
               onClick={() =>
                 fileInputRef.current?.click()
               }
-              style={{
-                padding: "12px 22px",
-                background: "#2563eb",
-                color: "#fff",
-                border: "none",
-                borderRadius: 8,
-                cursor: "pointer",
-              }}
+              className="settings-upload-btn"
             >
               Upload Photo
             </button>
 
             <button
               onClick={() => setShowEditModal(true)}
-              style={{
-                padding: "12px 22px",
-                background: "#0f766e",
-                color: "#fff",
-                border: "none",
-                borderRadius: 8,
-                cursor: "pointer",
-              }}
+              className="settings-edit-btn"
             >
               Edit Profile
             </button>
+
           </div>
+
         </div>
 
         {/* Edit Profile Modal */}
@@ -411,7 +363,9 @@ export default function SettingsPage() {
             onSave={saveProfile}
           />
         )}
+
       </div>
     </MainLayout>
   );
 }
+

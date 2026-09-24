@@ -1,3 +1,4 @@
+
 "use client";
 
 export default function EmployeeToolbar({
@@ -14,45 +15,22 @@ export default function EmployeeToolbar({
   onRefresh,
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "25px",
-        gap: "15px",
-        flexWrap: "wrap",
-      }}
-    >
+    <div className="employee-toolbar">
       {/* Search Box */}
       <input
         type="text"
         placeholder="Search Employee..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        style={{
-          padding: "10px",
-          width: "300px",
-          borderRadius: "8px",
-          border: "1px solid #ccc",
-        }}
+        className="employee-search"
       />
 
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="employee-filters">
         {/* Department Filter */}
         <select
           value={department}
           onChange={(e) => setDepartment(e.target.value)}
-          style={{
-            padding: "10px",
-            borderRadius: "8px",
-          }}
+          className="employee-filter-select"
         >
           <option value="">All Departments</option>
 
@@ -67,10 +45,7 @@ export default function EmployeeToolbar({
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          style={{
-            padding: "10px",
-            borderRadius: "8px",
-          }}
+          className="employee-filter-select"
         >
           <option value="">All Roles</option>
 
@@ -85,27 +60,17 @@ export default function EmployeeToolbar({
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          style={{
-            padding: "10px",
-            borderRadius: "8px",
-          }}
+          className="employee-filter-select"
         >
           <option value="">All Status</option>
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
         </select>
 
-        {/* Refresh Button */}
+        {/* Refresh */}
         <button
           onClick={onRefresh}
-          style={{
-            padding: "10px 20px",
-            background: "#2563eb",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-          }}
+          className="employee-refresh-btn"
         >
           Refresh
         </button>
@@ -113,3 +78,4 @@ export default function EmployeeToolbar({
     </div>
   );
 }
+

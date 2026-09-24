@@ -177,6 +177,7 @@ export default function LeavesPage() {
     <MainLayout>
 
       <div
+        className="leaves-page-header"
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -214,6 +215,7 @@ export default function LeavesPage() {
       </div>
 
       <table
+        className="leaves-table"
         style={{
           width: "100%",
           borderCollapse: "collapse",
@@ -352,7 +354,10 @@ export default function LeavesPage() {
                     {leave.Reason}
                   </td>
 
-                  <td style={tdStyle}>
+                  <td
+                    className="leaves-actions-cell"
+                    style={tdStyle}
+                  >
 
                     <button
                       onClick={() => {
