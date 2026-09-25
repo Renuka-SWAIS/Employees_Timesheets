@@ -9,10 +9,16 @@ export default function Sidebar() {
   const router = useRouter();
 
   const [menuItems, setMenuItems] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const storedUser = localStorage.getItem("user");
 
+    if (!storedUser) {
+      return;
+    }
+
+    const user = JSON.parse(storedUser);
     const role = user?.RoleType;
 
     if (role === "Admin") {
@@ -82,38 +88,84 @@ export default function Sidebar() {
     router.refresh();
   };
 
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
+
   return (
-    <aside className="sidebar">
-      <div>
-        <div className="sidebar-logo">
-          <h1>SWAIS</h1>
-
-          <span className="sidebar-subtitle">
-            <b>SWAIS Employees</b>
-          </span>
-        </div>
-
-        <nav className="sidebar-menu">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              href={item.path}
-              className={pathname === item.path ? "active" : ""}
-            >
-              <span>{item.icon}</span>
-              <span>{item.name}</span>
-            </Link>
-          ))}
-        </nav>
-      </div>
-
+    <>
+      {/* ==========================
+          MOBILE MENU BUTTON
+          Hidden when sidebar is open
+      ========================== */}
       <button
         type="button"
-        className="logout"
-        onClick={handleLogout}
+        className={`mobile-menu-btn ${
+          sidebarOpen ? "mobile-menu-btn-hidden" : ""
+        }`}
+        onClick={() => setSidebarOpen(true)}
+        aria-label="Open sidebar"
       >
-        Logout
+        ☰
       </button>
-    </aside>
+
+      {/* ==========================
+          MOBILE OVERLAY
+      ========================== */}
+      <div
+        className={`sidebar-overlay ${
+          sidebarOpen ? "show" : ""
+        }`}
+        onClick={closeSidebar}
+      />
+
+      {/* ==========================
+          SIDEBAR
+      ========================== */}
+      <aside
+        className={`sidebar ${
+          sidebarOpen ? "open" : ""
+        }`}
+      >
+        <div>
+          {/* LOGO */}
+          <div className="sidebar-logo">
+            <h1>SWAIS</h1>
+
+            <span className="sidebar-subtitle">
+              <b>SWAIS Employees</b>
+            </span>
+          </div>
+
+          {/* MENU */}
+          <nav className="sidebar-menu">
+            {menuItems.map((item) => (
+              <Link
+                key={item.path}
+                href={item.path}
+                className={
+                  pathname === item.path ? "active" : ""
+                }
+                onClick={closeSidebar}
+              >
+                <span>{item.icon}</span>
+                <span>{item.name}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        {/* ==========================
+            LOGOUT
+        ========================== */}
+        <button
+          type="button"
+          className="logout"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+      </aside>
+    </>
   );
 }

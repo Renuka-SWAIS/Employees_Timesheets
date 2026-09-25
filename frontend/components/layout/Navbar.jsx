@@ -55,7 +55,7 @@ export default function Navbar() {
 
 
         <p className="navbar-subtitle">
-          <p>Welcome to SWAIS Employees</p>
+          Welcome to SWAIS Employees
         </p>
 
       </div>
