@@ -83,6 +83,35 @@ body {
    LOGOUT
 ========================== */
 
+.logout {
+  position: fixed;
+
+  left: 20px;
+  bottom: 20px;
+
+  width: 210px;
+
+  padding: 12px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: white;
+
+  cursor: pointer;
+  font-weight: 600;
+
+  box-sizing: border-box;
+
+  z-index: 2000;
+}
+
+.logout:hover {
+  background: #1d4ed8;
+}
+
+
 
 /* ==========================
    MAIN CONTENT
