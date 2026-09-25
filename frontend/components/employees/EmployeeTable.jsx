@@ -22,7 +22,17 @@ export default function EmployeeTable({
       <table className="employee-table">
         <thead>
           <tr>
-            <th style={th}>Code</th>
+           
+<th
+  style={{
+    ...th,
+    width: "55px",
+  }}
+>
+  Code
+</th>
+
+
             <th style={th}>Name</th>
             <th style={th}>Email</th>
             <th style={th}>Department</th>
@@ -36,11 +46,34 @@ export default function EmployeeTable({
         <tbody>
           {employees.map((emp) => (
             <tr key={emp.EmployeeID}>
-              <td style={td}>{emp.EmployeeCode}</td>
+             
+
+<td
+  style={{
+    ...td,
+    width: "55px",
+    whiteSpace: "nowrap",
+  }}
+>
+  {emp.EmployeeCode}
+</td>
+
+
 
               <td style={td}>{emp.EmployeeName}</td>
 
-              <td style={td}>{emp.EmailID}</td>
+              
+<td
+  style={{
+    ...td,
+    minWidth: "180px",
+    whiteSpace: "nowrap",
+  }}
+>
+  {emp.EmailID}
+</td>
+
+
 
               <td style={td}>{emp.Department}</td>
 
