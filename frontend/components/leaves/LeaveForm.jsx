@@ -147,7 +147,7 @@ export default function LeaveForm({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 999,
+    zIndex: 9999,
     padding: "20px",
     boxSizing: "border-box",
     overflowY: "auto",
@@ -155,25 +155,33 @@ export default function LeaveForm({
 >
 
 
-      <div
-        style={{
-          width: "600px",
-          maxWidth: "100%",
-          maxHeight: "calc(100vh - 40px)",
-          background: "#fff",
-          borderRadius: "12px",
-          padding: "30px",
-          boxSizing: "border-box",
-          overflowY: "auto",
-        }}
-      >
-        <h2
-          style={{
-            marginBottom: "20px",
-          }}
-        >
-          {editData ? "Edit Leave" : "Apply Leave"}
-        </h2>
+      
+      
+<div
+  style={{
+    width: "600px",
+    maxWidth: "100%",
+    maxHeight: "calc(100vh - 40px)",
+    background: "#fff",
+    borderRadius: "12px",
+    padding: "25px",
+    boxSizing: "border-box",
+    overflowY: "auto",
+    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
+  }}
+>
+
+<h2
+  style={{
+    margin: 0,
+    marginBottom: "20px",
+    fontSize: "26px",
+    fontWeight: "700",
+  }}
+>
+  {editData ? "Edit Leave" : "Apply Leave"}
+</h2>
+
 
         <form onSubmit={handleSubmit}>
           {/* Employee - Admin Only */}
@@ -356,15 +364,19 @@ export default function LeaveForm({
 
           {/* Buttons */}
           <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "10px",
-              marginTop: "20px",
-              paddingTop: "15px",
-              borderTop: "1px solid #e5e7eb",
-              background: "#fff",
-            }}
+           
+style={{
+  display: "flex",
+  justifyContent: "flex-end",
+  alignItems: "center",
+  gap: "10px",
+  marginTop: "25px",
+  paddingTop: "18px",
+  borderTop: "1px solid #e5e7eb",
+  background: "#fff",
+}}
+
+
           >
             <button
               type="button"
@@ -389,8 +401,9 @@ export default function LeaveForm({
 
 const inputStyle = {
   width: "100%",
-  padding: "12px",
-  marginBottom: "15px",
+  height: "46px",
+  padding: "0 12px",
+  marginBottom: "16px",
   border: "1px solid #d1d5db",
   borderRadius: "8px",
   fontSize: "15px",
@@ -398,23 +411,37 @@ const inputStyle = {
   boxSizing: "border-box",
 };
 
+
+
+
 const saveBtn = {
+  minWidth: "100px",
+  height: "42px",
   background: "#2563eb",
   color: "#fff",
   border: "none",
-  padding: "10px 20px",
+  padding: "0 20px",
   borderRadius: "8px",
   cursor: "pointer",
   fontWeight: "600",
+  fontSize: "14px",
 };
 
+
+
+
 const cancelBtn = {
+  minWidth: "100px",
+  height: "42px",
   background: "#6b7280",
   color: "#fff",
   border: "none",
-  padding: "10px 20px",
+  padding: "0 20px",
   borderRadius: "8px",
   cursor: "pointer",
   fontWeight: "600",
+  fontSize: "14px",
 };
+
+
 

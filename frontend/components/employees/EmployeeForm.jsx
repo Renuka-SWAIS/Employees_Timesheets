@@ -75,20 +75,39 @@ export default function EmployeeForm({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 999,
+        zIndex: 9999,
       }}
     >
-      <div
-        style={{
-          width: 600,
-          background: "#fff",
-          borderRadius: 12,
-          padding: 25,
-        }}
-      >
-        <h2>
-          {employee ? "Edit Employee" : "Add Employee"}
-        </h2>
+      
+<div
+  style={{
+    width: "600px",
+    maxWidth: "100%",
+    maxHeight: "calc(100vh - 40px)",
+    background: "#fff",
+    borderRadius: "12px",
+    padding: "25px",
+    boxSizing: "border-box",
+    overflowY: "auto",
+    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
+  }}
+>
+
+
+      
+        
+<h2
+  style={{
+    margin: 0,
+    marginBottom: "20px",
+    fontSize: "26px",
+    fontWeight: "700",
+  }}
+>
+  {employee ? "Edit Employee" : "Add Employee"}
+</h2>
+
+
 
         <form onSubmit={handleSubmit}>
 
@@ -153,12 +172,19 @@ export default function EmployeeForm({
           </select>
 
           <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: 10,
-              marginTop: 20,
-            }}
+          
+style={{
+  display: "flex",
+  justifyContent: "flex-end",
+  alignItems: "center",
+  gap: "10px",
+  marginTop: "25px",
+  paddingTop: "18px",
+  borderTop: "1px solid #e5e7eb",
+  background: "#fff",
+}}
+
+
           >
             <button
               type="button"
@@ -182,28 +208,47 @@ export default function EmployeeForm({
   );
 }
 
+
 const inputStyle = {
   width: "100%",
-  padding: "10px",
-  marginBottom: "12px",
+  height: "46px",
+  padding: "0 12px",
+  marginBottom: "16px",
+  border: "1px solid #d1d5db",
   borderRadius: "8px",
-  border: "1px solid #ccc",
+  fontSize: "15px",
+  outline: "none",
+  boxSizing: "border-box",
 };
 
+
+
+
 const saveBtn = {
+  minWidth: "100px",
+  height: "42px",
   background: "#2563eb",
   color: "#fff",
   border: "none",
-  padding: "10px 20px",
+  padding: "0 20px",
   borderRadius: "8px",
   cursor: "pointer",
+  fontWeight: "600",
+  fontSize: "14px",
 };
 
+
+
+
 const cancelBtn = {
+  minWidth: "100px",
+  height: "42px",
   background: "#6b7280",
   color: "#fff",
   border: "none",
-  padding: "10px 20px",
+  padding: "0 20px",
   borderRadius: "8px",
   cursor: "pointer",
+  fontWeight: "600",
+  fontSize: "14px",
 };

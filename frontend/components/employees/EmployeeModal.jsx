@@ -42,6 +42,7 @@ export default function EmployeeModal({
 
   return (
     <div
+    className="employee-modal-overlay"
       style={{
         position: "fixed",
         inset: 0,
@@ -49,7 +50,7 @@ export default function EmployeeModal({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 999,
+        zIndex: 9999,
       }}
     >
       <div
