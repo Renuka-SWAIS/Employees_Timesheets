@@ -1306,6 +1306,7 @@ th {
     white-space: normal !important;
     word-break: break-word !important;
     overflow-wrap: anywhere !important;
+
     max-width: 0 !important;
   }
 
@@ -1981,9 +1982,14 @@ th {
     padding: 4px 2px !important;
     font-size: 6px !important;
     line-height: 1.1 !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-    overflow-wrap: anywhere !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+
     max-width: 0 !important;
     vertical-align: middle;
   }
@@ -1992,6 +1998,10 @@ th {
     padding: 3px 4px !important;
     font-size: 5px !important;
     border-radius: 8px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   .employee-actions-cell {
@@ -2013,7 +2023,10 @@ th {
     font-size: 5px !important;
     line-height: 1.1;
     box-sizing: border-box;
-    white-space: normal;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 }
 
@@ -2036,6 +2049,28 @@ th {
   .employee-action-buttons button {
     padding: 3px 1px !important;
     font-size: 4.5px !important;
+  }
+}
+
+
+
+/* ==========================
+   LEAVE MODAL - MOBILE
+========================== */
+
+@media (max-width: 768px) {
+  .leave-modal-overlay {
+    left: 74px !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    padding: 8px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .leave-modal-overlay {
+    left: 70px !important;
   }
 }
 

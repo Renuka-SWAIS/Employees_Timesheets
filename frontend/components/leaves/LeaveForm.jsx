@@ -137,20 +137,24 @@ export default function LeaveForm({
   }
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,.45)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 999,
-        padding: "20px",
-        boxSizing: "border-box",
-        overflowY: "auto",
-      }}
-    >
+   
+<div
+  className="leave-modal-overlay"
+  style={{
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,.45)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+    padding: "20px",
+    boxSizing: "border-box",
+    overflowY: "auto",
+  }}
+>
+
+
       <div
         style={{
           width: "600px",
