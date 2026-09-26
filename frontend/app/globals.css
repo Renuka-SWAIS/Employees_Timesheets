@@ -2692,3 +2692,61 @@ th {
     padding-top: 48px !important;
   }
 }
+
+
+/* =========================================
+   EMPLOYEE CODE COLUMN - FINAL FIX
+========================================= */
+
+/* DESKTOP */
+@media (min-width: 769px) {
+
+  .employee-table th:nth-child(1),
+  .employee-table td:nth-child(1) {
+    width: 75px !important;
+    min-width: 75px !important;
+    max-width: 75px !important;
+
+    font-size: 14px !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+  .employee-table th:nth-child(1),
+  .employee-table td:nth-child(1) {
+    width: 55px !important;
+    min-width: 55px !important;
+    max-width: 55px !important;
+
+    font-size: 7px !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
+
+/* VERY SMALL MOBILE */
+@media (max-width: 360px) {
+
+  .employee-table th:nth-child(1),
+  .employee-table td:nth-child(1) {
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
+
+    font-size: 6px !important;
+  }
+}
