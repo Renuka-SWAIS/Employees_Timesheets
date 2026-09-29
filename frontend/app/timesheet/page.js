@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useState } from "react";
@@ -43,36 +44,38 @@ export default function TimesheetPage() {
       ? JSON.parse(localStorage.getItem("user") || "null")
       : null;
 
-  const role = user?.RoleType;
+  const role = user?.RoleType || user?.role;
 
-  const isAdmin = role === "Admin";
+  const isAdmin =
+    String(role || "").trim().toLowerCase() === "admin";
 
   // ==========================================
   // Filter Timesheets
   // ==========================================
 
   const filteredTimesheets = useMemo(() => {
-  return timesheets
-    .filter((item) => {
-      const matchesSearch =
-        item.Project?.toLowerCase().includes(
-          search.toLowerCase()
-        ) ||
-        item.TaskDescription?.toLowerCase().includes(
-          search.toLowerCase()
-        );
+    return timesheets
+      .filter((item) => {
+        const matchesSearch =
+          item.Project?.toLowerCase().includes(
+            search.toLowerCase()
+          ) ||
+          item.TaskDescription?.toLowerCase().includes(
+            search.toLowerCase()
+          );
 
-      const matchesMonth =
-        new Date(item.WorkDate).toLocaleString("default", {
-          month: "long",
-        }) === month;
+        const matchesMonth =
+          new Date(item.WorkDate).toLocaleString("default", {
+            month: "long",
+          }) === month;
 
-      return matchesSearch && matchesMonth;
-    })
-    .sort((a, b) => {
-      return new Date(b.WorkDate) - new Date(a.WorkDate);
-    });
-}, [timesheets, search, month]);
+        return matchesSearch && matchesMonth;
+      })
+      .sort((a, b) => {
+        return new Date(b.WorkDate) - new Date(a.WorkDate);
+      });
+  }, [timesheets, search, month]);
+
   // ==========================================
   // Check Current Month
   // ==========================================
@@ -199,15 +202,15 @@ export default function TimesheetPage() {
       />
 
       <TimesheetForm
-  open={showForm}
-  editData={selected}
-  isAdmin={isAdmin}
-  onClose={() => {
-    setShowForm(false);
-    setSelected(null);
-  }}
-  onSave={handleSave}
-/>
+        open={showForm}
+        editData={selected}
+        isAdmin={isAdmin}
+        onClose={() => {
+          setShowForm(false);
+          setSelected(null);
+        }}
+        onSave={handleSave}
+      />
 
       <DeleteModal
         open={showDelete}
@@ -220,3 +223,4 @@ export default function TimesheetPage() {
     </MainLayout>
   );
 }
+

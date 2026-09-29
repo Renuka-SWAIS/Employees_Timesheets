@@ -6,9 +6,12 @@ from typing import Optional
 
 # ==========================================
 # CREATE TIMESHEET
-# EmployeeID comes from JWT login
+# EmployeeID:
+# - User -> backend uses logged-in employee
+# - Admin -> can provide selected employee
 # ==========================================
 class TimesheetCreate(BaseModel):
+    EmployeeID: Optional[UUID] = None
     WorkDate: date
     Month: int
     Year: int
@@ -51,3 +54,4 @@ class TimesheetResponse(BaseModel):
 
     class Config:
         from_attributes = True
+

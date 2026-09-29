@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -119,46 +120,45 @@ export default function EmployeeTimesheetsPage() {
 
   return (
     <MainLayout>
-
       {/* Back Button */}
 
       <div
-  style={{
-    display: "flex",
-    gap: "12px",
-    marginBottom: "20px",
-  }}
->
-  <button
-    onClick={() => router.push("/employees")}
-    style={{
-      background: "#2563eb",
-      color: "#fff",
-      border: "none",
-      padding: "10px 18px",
-      borderRadius: "8px",
-      cursor: "pointer",
-    }}
-  >
-    ← Back to Employees
-  </button>
+        style={{
+          display: "flex",
+          gap: "12px",
+          marginBottom: "20px",
+        }}
+      >
+        <button
+          onClick={() => router.push("/employees")}
+          style={{
+            background: "#2563eb",
+            color: "#fff",
+            border: "none",
+            padding: "10px 18px",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          ← Back to Employees
+        </button>
 
-  <button
-    onClick={() =>
-      router.push(`/employees/${employeeId}/leaves`)
-    }
-    style={{
-      background: "#16a34a",
-      color: "#fff",
-      border: "none",
-      padding: "10px 18px",
-      borderRadius: "8px",
-      cursor: "pointer",
-    }}
-  >
-    🍃 View Leaves
-  </button>
-</div>
+        <button
+          onClick={() =>
+            router.push(`/employees/${employeeId}/leaves`)
+          }
+          style={{
+            background: "#16a34a",
+            color: "#fff",
+            border: "none",
+            padding: "10px 18px",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          🍃 View Leaves
+        </button>
+      </div>
 
       {/* Page Title */}
 
@@ -173,129 +173,148 @@ export default function EmployeeTimesheetsPage() {
           ? `${employee.EmployeeName} Timesheets`
           : "Employee Timesheets"}
       </h1>
-{/* Employee Profile Card */}
 
-{employee && (
-  <div
-    style={{
-      background: "#fff",
-      borderRadius: "18px",
-      padding: "30px 35px",
-      marginBottom: "30px",
-      boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
-      display: "flex",
-      alignItems: "center",
-      gap: "35px",
-    }}
-  >
-    {/* Employee Photo */}
+      {/* Employee Profile Card */}
 
-    <div
-      style={{
-        width: "140px",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexShrink: 0,
-      }}
-    >
-      <img
-        src={
-          employee.PhotoURL
-            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${employee.PhotoURL}`
-            : "/profile.png"
-        }
-        alt={employee.EmployeeName}
-        onError={(e) => {
-          e.target.src = "/profile.png";
-        }}
-        style={{
-          width: "110px",
-          height: "110px",
-          borderRadius: "50%",
-          objectFit: "cover",
-          objectPosition: "center",
-          border: "4px solid #2563eb",
-          background: "#f8fafc",
-          display: "block",
-        }}
-      />
-    </div>
+      {employee && (
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: "18px",
+            padding: "30px 35px",
+            marginBottom: "30px",
+            boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
+            display: "flex",
+            alignItems: "center",
+            gap: "35px",
+          }}
+        >
+          {/* Employee Photo */}
 
-    {/* Employee Details */}
-
-    <div style={{ flex: 1 }}>
-      <h2
-        style={{
-          margin: 0,
-          marginBottom: "20px",
-          fontSize: "32px",
-          fontWeight: "700",
-          color: "#1e3a8a",
-        }}
-      >
-        {employee.EmployeeName}
-      </h2>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(250px, 1fr))",
-          columnGap: "60px",
-          rowGap: "18px",
-        }}
-      >
-        <div>
-          <div style={{ fontWeight: 700 }}>Employee Code</div>
-          <div>{employee.EmployeeCode}</div>
-        </div>
-
-        <div>
-          <div style={{ fontWeight: 700 }}>Role</div>
-          <div>{employee.RoleType}</div>
-        </div>
-
-        <div>
-          <div style={{ fontWeight: 700 }}>Email</div>
-          <div>{employee.EmailID}</div>
-        </div>
-
-        <div>
-          <div style={{ fontWeight: 700 }}>Department</div>
-          <div>{employee.Department}</div>
-        </div>
-
-        <div>
-          <div style={{ fontWeight: 700 }}>Designation</div>
-          <div>{employee.Designation}</div>
-        </div>
-
-        <div>
-          <div style={{ fontWeight: 700, marginBottom: "5px" }}>Status</div>
-
-          <span
+          <div
             style={{
-              display: "inline-block",
-              background:
-                employee.Status === "Active"
-                  ? "#DCFCE7"
-                  : "#FEE2E2",
-              color:
-                employee.Status === "Active"
-                  ? "#15803D"
-                  : "#B91C1C",
-              padding: "6px 16px",
-              borderRadius: "20px",
-              fontWeight: "600",
+              width: "140px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexShrink: 0,
             }}
           >
-            {employee.Status}
-          </span>
+            <img
+              src={
+                employee.PhotoURL
+                  ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${employee.PhotoURL}`
+                  : "/profile.png"
+              }
+              alt={employee.EmployeeName}
+              onError={(e) => {
+                e.target.src = "/profile.png";
+              }}
+              style={{
+                width: "110px",
+                height: "110px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                objectPosition: "center",
+                border: "4px solid #2563eb",
+                background: "#f8fafc",
+                display: "block",
+              }}
+            />
+          </div>
+
+          {/* Employee Details */}
+
+          <div style={{ flex: 1 }}>
+            <h2
+              style={{
+                margin: 0,
+                marginBottom: "20px",
+                fontSize: "32px",
+                fontWeight: "700",
+                color: "#1e3a8a",
+              }}
+            >
+              {employee.EmployeeName}
+            </h2>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(2, minmax(250px, 1fr))",
+                columnGap: "60px",
+                rowGap: "18px",
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 700 }}>
+                  Employee Code
+                </div>
+                <div>{employee.EmployeeCode}</div>
+              </div>
+
+              <div>
+                <div style={{ fontWeight: 700 }}>
+                  Role
+                </div>
+                <div>{employee.RoleType}</div>
+              </div>
+
+              <div>
+                <div style={{ fontWeight: 700 }}>
+                  Email
+                </div>
+                <div>{employee.EmailID}</div>
+              </div>
+
+              <div>
+                <div style={{ fontWeight: 700 }}>
+                  Department
+                </div>
+                <div>{employee.Department}</div>
+              </div>
+
+              <div>
+                <div style={{ fontWeight: 700 }}>
+                  Designation
+                </div>
+                <div>{employee.Designation}</div>
+              </div>
+
+              <div>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    marginBottom: "5px",
+                  }}
+                >
+                  Status
+                </div>
+
+                <span
+                  style={{
+                    display: "inline-block",
+                    background:
+                      employee.Status === "Active"
+                        ? "#DCFCE7"
+                        : "#FEE2E2",
+                    color:
+                      employee.Status === "Active"
+                        ? "#15803D"
+                        : "#B91C1C",
+                    padding: "6px 16px",
+                    borderRadius: "20px",
+                    fontWeight: "600",
+                  }}
+                >
+                  {employee.Status}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
       {/* Total Entries */}
 
@@ -342,6 +361,7 @@ export default function EmployeeTimesheetsPage() {
       <TimesheetForm
         open={showForm}
         editData={selected}
+        isAdmin={true}
         onClose={() => {
           setShowForm(false);
           setSelected(null);
@@ -359,7 +379,7 @@ export default function EmployeeTimesheetsPage() {
         }}
         onConfirm={handleDelete}
       />
-
     </MainLayout>
   );
 }
+

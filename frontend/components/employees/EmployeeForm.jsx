@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -19,6 +20,7 @@ export default function EmployeeForm({
   employee,
 }) {
   const [form, setForm] = useState(initialState);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (employee) {
@@ -34,7 +36,9 @@ export default function EmployeeForm({
     } else {
       setForm(initialState);
     }
-  }, [employee]);
+
+    setSaving(false);
+  }, [employee, open]);
 
   if (!open) return null;
 
@@ -45,8 +49,10 @@ export default function EmployeeForm({
     }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+
+    if (saving) return;
 
     if (!form.EmployeeCode.trim()) {
       alert("Employee Code is required");
@@ -63,7 +69,12 @@ export default function EmployeeForm({
       return;
     }
 
-    onSave(form);
+    try {
+      setSaving(true);
+      await onSave(form);
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -78,45 +89,38 @@ export default function EmployeeForm({
         zIndex: 9999,
       }}
     >
-      
-<div
-  style={{
-    width: "600px",
-    maxWidth: "100%",
-    maxHeight: "calc(100vh - 40px)",
-    background: "#fff",
-    borderRadius: "12px",
-    padding: "25px",
-    boxSizing: "border-box",
-    overflowY: "auto",
-    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
-  }}
->
-
-
-      
-        
-<h2
-  style={{
-    margin: 0,
-    marginBottom: "20px",
-    fontSize: "26px",
-    fontWeight: "700",
-  }}
->
-  {employee ? "Edit Employee" : "Add Employee"}
-</h2>
-
-
+      <div
+        style={{
+          width: "600px",
+          maxWidth: "100%",
+          maxHeight: "calc(100vh - 40px)",
+          background: "#fff",
+          borderRadius: "12px",
+          padding: "25px",
+          boxSizing: "border-box",
+          overflowY: "auto",
+          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
+        }}
+      >
+        <h2
+          style={{
+            margin: 0,
+            marginBottom: "20px",
+            fontSize: "26px",
+            fontWeight: "700",
+          }}
+        >
+          {employee ? "Edit Employee" : "Add Employee"}
+        </h2>
 
         <form onSubmit={handleSubmit}>
-
           <input
             name="EmployeeCode"
             placeholder="Employee Code"
             value={form.EmployeeCode}
             onChange={handleChange}
             style={inputStyle}
+            disabled={saving}
           />
 
           <input
@@ -125,6 +129,7 @@ export default function EmployeeForm({
             value={form.EmployeeName}
             onChange={handleChange}
             style={inputStyle}
+            disabled={saving}
           />
 
           <input
@@ -133,6 +138,7 @@ export default function EmployeeForm({
             value={form.EmailID}
             onChange={handleChange}
             style={inputStyle}
+            disabled={saving}
           />
 
           <select
@@ -140,6 +146,7 @@ export default function EmployeeForm({
             value={form.RoleType}
             onChange={handleChange}
             style={inputStyle}
+            disabled={saving}
           >
             <option value="User">User</option>
             <option value="Admin">Admin</option>
@@ -151,6 +158,7 @@ export default function EmployeeForm({
             value={form.Department}
             onChange={handleChange}
             style={inputStyle}
+            disabled={saving}
           />
 
           <input
@@ -159,6 +167,7 @@ export default function EmployeeForm({
             value={form.Designation}
             onChange={handleChange}
             style={inputStyle}
+            disabled={saving}
           />
 
           <select
@@ -166,48 +175,58 @@ export default function EmployeeForm({
             value={form.Status}
             onChange={handleChange}
             style={inputStyle}
+            disabled={saving}
           >
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
           </select>
 
           <div
-          
-style={{
-  display: "flex",
-  justifyContent: "flex-end",
-  alignItems: "center",
-  gap: "10px",
-  marginTop: "25px",
-  paddingTop: "18px",
-  borderTop: "1px solid #e5e7eb",
-  background: "#fff",
-}}
-
-
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              gap: "10px",
+              marginTop: "25px",
+              paddingTop: "18px",
+              borderTop: "1px solid #e5e7eb",
+              background: "#fff",
+            }}
           >
             <button
               type="button"
               onClick={onClose}
-              style={cancelBtn}
+              style={{
+                ...cancelBtn,
+                opacity: saving ? 0.6 : 1,
+                cursor: saving ? "not-allowed" : "pointer",
+              }}
+              disabled={saving}
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              style={saveBtn}
+              style={{
+                ...saveBtn,
+                opacity: saving ? 0.6 : 1,
+                cursor: saving ? "not-allowed" : "pointer",
+              }}
+              disabled={saving}
             >
-              {employee ? "Update Employee" : "Save Employee"}
+              {saving
+                ? "Saving..."
+                : employee
+                  ? "Update Employee"
+                  : "Save Employee"}
             </button>
           </div>
-
         </form>
       </div>
     </div>
   );
 }
-
 
 const inputStyle = {
   width: "100%",
@@ -221,9 +240,6 @@ const inputStyle = {
   boxSizing: "border-box",
 };
 
-
-
-
 const saveBtn = {
   minWidth: "100px",
   height: "42px",
@@ -236,9 +252,6 @@ const saveBtn = {
   fontWeight: "600",
   fontSize: "14px",
 };
-
-
-
 
 const cancelBtn = {
   minWidth: "100px",

@@ -1,15 +1,16 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { getTasks } from "../../services/task";
+import { getEmployees } from "../../services/employee";
 
 const initialState = {
+  EmployeeID: "",
   WorkDate: "",
   Month: new Date().getMonth() + 1,
   Year: new Date().getFullYear(),
-
   TaskID: "",
-
   Project: "",
   TaskDescription: "",
   HoursWorked: "",
@@ -25,6 +26,7 @@ export default function TimesheetForm({
 }) {
   const [form, setForm] = useState(initialState);
   const [tasks, setTasks] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
 
   /* --------------------------------
@@ -33,7 +35,9 @@ export default function TimesheetForm({
   useEffect(() => {
     if (editData) {
       setForm({
+        ...initialState,
         ...editData,
+        EmployeeID: editData.EmployeeID || "",
         WorkDate: editData.WorkDate
           ? editData.WorkDate.split("T")[0]
           : "",
@@ -62,6 +66,24 @@ export default function TimesheetForm({
 
     loadTasks();
   }, []);
+
+  /* --------------------------------
+     LOAD EMPLOYEES FOR ADMIN
+  -------------------------------- */
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    async function loadEmployees() {
+      try {
+        const data = await getEmployees();
+        setEmployees(data);
+      } catch (err) {
+        console.error("Failed to load employees:", err);
+      }
+    }
+
+    loadEmployees();
+  }, [isAdmin]);
 
   /* --------------------------------
      SELECTED TASK
@@ -149,35 +171,41 @@ export default function TimesheetForm({
       alert("Date is required.");
       return;
     }
-    // User date restriction
-if (!isAdmin) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
 
-  const selectedDate = new Date(form.WorkDate);
-  selectedDate.setHours(0, 0, 0, 0);
+    /* --------------------------------
+       ADMIN EMPLOYEE VALIDATION
+    -------------------------------- */
+    if (isAdmin && !form.EmployeeID) {
+      alert("Please select an employee.");
+      return;
+    }
 
-  const sevenDaysAgo = new Date(today);
-  sevenDaysAgo.setDate(today.getDate() - 7);
+    /* --------------------------------
+       USER DATE RESTRICTION
+    -------------------------------- */
+   if (!isAdmin && !editData) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-  if (selectedDate < sevenDaysAgo) {
-    alert(
-      "You cannot enter a timesheet for a date older than 7 days."
-    );
-    return;
-  }
-}
+      const selectedDate = new Date(form.WorkDate);
+      selectedDate.setHours(0, 0, 0, 0);
+
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(today.getDate() - 7);
+
+      if (selectedDate < sevenDaysAgo) {
+        alert(
+          "You cannot enter a timesheet for a date older than 7 days."
+        );
+        return;
+      }
+    }
 
     if (!form.TaskID) {
       alert("Please select a task.");
       return;
     }
 
-    /* --------------------------------
-       TASK DETAILS
-       Only required.
-       NO MINIMUM CHARACTER CHECK.
-    -------------------------------- */
     if (!form.TaskDescription.trim()) {
       alert("Task Details are required.");
       return;
@@ -198,168 +226,130 @@ if (!isAdmin) {
 
     const payload = {
       WorkDate: form.WorkDate,
-
       Month: new Date(form.WorkDate).getMonth() + 1,
-
       Year: new Date(form.WorkDate).getFullYear(),
-
       TaskID: form.TaskID,
-
       Project: selectedTask?.TaskName || "",
-
       TaskDescription: form.TaskDescription,
-
       HoursWorked: Number(form.HoursWorked),
-
       Remarks: form.Remarks,
     };
+
+    if (isAdmin) {
+      payload.EmployeeID = form.EmployeeID;
+    }
 
     onSave(payload);
   }
 
   return (
     <>
-      {/* =========================================
-          FULL SCREEN OVERLAY
-      ========================================= */}
       <div
         style={{
           position: "fixed",
-
           inset: 0,
-
           width: "100%",
-
           height: "100dvh",
-
           background: "rgba(0,0,0,0.45)",
-
           zIndex: 99999,
-
           display: "flex",
-
           alignItems: "center",
-
           justifyContent: "center",
-
           padding: "8px",
-
           boxSizing: "border-box",
-
           overflow: "hidden",
-
           overscrollBehavior: "none",
         }}
       >
-        {/* =========================================
-            MODAL
-
-            GRID:
-            1. Header
-            2. Scrollable Form
-            3. Fixed Footer
-        ========================================= */}
-      <div
-  className="timesheet-modal"
-  style={{
-    position: "relative",
-    width: "600px",
-    maxWidth: "100%",
-
+        <div
+          className="timesheet-modal"
+          style={{
+            position: "relative",
+            width: "600px",
+            maxWidth: "100%",
             height: "calc(100dvh - 24px)",
-
             maxHeight: "calc(100dvh - 24px)",
-
             minHeight: 0,
-
             background: "#ffffff",
-
             borderRadius: "12px",
-
             boxSizing: "border-box",
-
             display: "grid",
-
-            gridTemplateRows:
-              "auto minmax(0, 1fr) 72px",
-
+            gridTemplateRows: "auto minmax(0, 1fr) 72px",
             overflow: "hidden",
-
-            boxShadow:
-              "0 20px 50px rgba(0,0,0,0.25)",
-
+            boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
             overscrollBehavior: "contain",
           }}
         >
-          {/* =========================================
-              HEADER
-          ========================================= */}
           <div
             style={{
               padding: "18px 30px 14px 30px",
-
               background: "#ffffff",
-
-              borderBottom:
-                "1px solid #f1f5f9",
-
+              borderBottom: "1px solid #f1f5f9",
               boxSizing: "border-box",
-
               zIndex: 20,
             }}
           >
             <h2
               style={{
                 margin: 0,
-
                 fontSize: "22px",
-
                 fontWeight: "700",
-
                 color: "#111827",
               }}
             >
-              {editData
-                ? "Edit Timesheet"
-                : "Add Timesheet"}
+              {editData ? "Edit Timesheet" : "Add Timesheet"}
             </h2>
           </div>
 
-          {/* =========================================
-              SCROLLABLE FORM SECTION
-          ========================================= */}
           <div
-          className="timesheet-modal-body"
+            className="timesheet-modal-body"
             style={{
               minHeight: 0,
-
               height: "100%",
-
               overflowY: "auto",
-
               overflowX: "hidden",
-
               WebkitOverflowScrolling: "touch",
-
               overscrollBehavior: "contain",
-
               padding: "16px 30px 24px 30px",
-
               boxSizing: "border-box",
-
               scrollbarWidth: "thin",
             }}
           >
-            <form
-              id="timesheet-form"
-              onSubmit={handleSubmit}
-            >
-              {/* =================================
-                  DATE
-              ================================= */}
-              <label style={labelStyle}>
-                Date
-              </label>
+            <form id="timesheet-form" onSubmit={handleSubmit}>
+
+              {/* ADMIN EMPLOYEE */}
+              {isAdmin && (
+                <>
+                  <label style={labelStyle}>
+                    Employee
+                  </label>
+
+                  <select
+                    name="EmployeeID"
+                    value={form.EmployeeID}
+                    onChange={handleChange}
+                    style={inputStyle}
+                    required
+                  >
+                    <option value="">
+                      Select Employee
+                    </option>
+
+                    {employees.map((employee) => (
+                      <option
+                        key={employee.EmployeeID}
+                        value={employee.EmployeeID}
+                      >
+                        {employee.EmployeeCode} -{" "}
+                        {employee.EmployeeName}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
+
+              {/* DATE */}
+              <label style={labelStyle}>Date</label>
 
               <input
                 type="date"
@@ -370,12 +360,8 @@ if (!isAdmin) {
                 required
               />
 
-              {/* =================================
-                  TASK
-              ================================= */}
-              <label style={labelStyle}>
-                Task
-              </label>
+              {/* TASK */}
+              <label style={labelStyle}>Task</label>
 
               <select
                 name="TaskID"
@@ -389,53 +375,36 @@ if (!isAdmin) {
 
                   setForm((prev) => ({
                     ...prev,
-
                     TaskID: e.target.value,
-
-                    Project: task
-                      ? task.TaskName
-                      : "",
+                    Project: task ? task.TaskName : "",
                   }));
                 }}
                 style={inputStyle}
                 required
               >
-                <option value="">
-                  Select Task
-                </option>
+                <option value="">Select Task</option>
 
                 {tasks.map((task) => (
                   <option
                     key={task.TaskID}
                     value={task.TaskID}
                   >
-                    {task.TaskCode} -{" "}
-                    {task.TaskName}
+                    {task.TaskCode} - {task.TaskName}
                   </option>
                 ))}
               </select>
 
-              {/* =================================
-                  SELECTED TASK INFORMATION
-              ================================= */}
+              {/* SELECTED TASK INFORMATION */}
               {selectedTask && (
                 <div
                   style={{
                     background: "#f8fafc",
-
-                    border:
-                      "1px solid #dbeafe",
-
+                    border: "1px solid #dbeafe",
                     borderRadius: "8px",
-
                     padding: "15px",
-
                     marginBottom: "18px",
-
                     lineHeight: "24px",
-
                     fontSize: "14px",
-
                     boxSizing: "border-box",
                   }}
                 >
@@ -456,12 +425,8 @@ if (!isAdmin) {
                 </div>
               )}
 
-              {/* =================================
-                  TASK DETAILS
-              ================================= */}
-              <label style={labelStyle}>
-                Task Details
-              </label>
+              {/* TASK DETAILS */}
+              <label style={labelStyle}>Task Details</label>
 
               <textarea
                 rows={4}
@@ -476,83 +441,51 @@ if (!isAdmin) {
                 required
               />
 
-              {/* =================================
-                  HOURS
-              ================================= */}
-              <label style={labelStyle}>
-                Hours
-              </label>
-<input
-  type="text"
-  inputMode="decimal"
-  name="HoursWorked"
-  value={form.HoursWorked}
-  onChange={handleChange}
-  placeholder="Examples: 1, 0.25, 0.50, 1.59"
-  style={inputStyle}
-  required
-/>
+              {/* HOURS */}
+              <label style={labelStyle}>Hours</label>
 
-              {/* =================================
-                  HOURS HELP
-              ================================= */}
+              <input
+                type="text"
+                inputMode="decimal"
+                name="HoursWorked"
+                value={form.HoursWorked}
+                onChange={handleChange}
+                placeholder="Examples: 1, 0.25, 0.50, 1.59"
+                style={inputStyle}
+                required
+              />
+
+              {/* HOURS HELP */}
               <div
                 style={{
                   marginTop: "-8px",
-
                   marginBottom: "18px",
-
                   fontSize: "12px",
-
                   color: "#6b7280",
-
                   lineHeight: "18px",
                 }}
               >
                 <div>Examples:</div>
-
-                <div>
-                  • 1 = 1 Hour
-                </div>
-
-                <div>
-                  • 0.25 = 25 Minutes
-                </div>
-
-                <div>
-                  • 0.50 = 50 Minutes
-                </div>
-
-                <div>
-                  • 1.25 = 1 Hour 25 Minutes
-                </div>
-
-                <div>
-                  • 1.59 = 1 Hour 59 Minutes
-                </div>
+                <div>• 1 = 1 Hour</div>
+                <div>• 0.25 = 25 Minutes</div>
+                <div>• 0.50 = 50 Minutes</div>
+                <div>• 1.25 = 1 Hour 25 Minutes</div>
+                <div>• 1.59 = 1 Hour 59 Minutes</div>
 
                 <span
                   style={{
                     display: "block",
-
                     marginTop: "2px",
-
                     color: "#dc2626",
-
                     fontWeight: "600",
                   }}
                 >
-                  Minutes must be between 00
-                  and 59 only.
+                  Minutes must be between 00 and 59 only.
                 </span>
               </div>
 
-              {/* =================================
-                  REMARKS
-              ================================= */}
-              <label style={labelStyle}>
-                Remarks
-              </label>
+              {/* REMARKS */}
+              <label style={labelStyle}>Remarks</label>
 
               <textarea
                 rows={3}
@@ -566,55 +499,28 @@ if (!isAdmin) {
                 }}
               />
 
-              {/* BOTTOM SPACE */}
-              <div
-                style={{
-                  height: "20px",
-                }}
-              />
+              <div style={{ height: "20px" }} />
             </form>
           </div>
 
-          {/* =========================================
-              FOOTER
-
-              ALWAYS VISIBLE
-              NEVER SCROLLS
-          ========================================= */}
+          {/* FOOTER */}
           <div
             style={{
               height: "72px",
-
               minHeight: "72px",
-
               width: "100%",
-
               display: "flex",
-
               justifyContent: "flex-end",
-
               alignItems: "center",
-
               gap: "10px",
-
               padding: "10px 20px",
-
-              borderTop:
-                "1px solid #e5e7eb",
-
+              borderTop: "1px solid #e5e7eb",
               background: "#ffffff",
-
               boxSizing: "border-box",
-
               zIndex: 100,
-
-              boxShadow:
-                "0 -4px 12px rgba(0,0,0,0.06)",
+              boxShadow: "0 -4px 12px rgba(0,0,0,0.06)",
             }}
           >
-            {/* =================================
-                CANCEL
-            ================================= */}
             <button
               type="button"
               onClick={onClose}
@@ -623,17 +529,12 @@ if (!isAdmin) {
               Cancel
             </button>
 
-            {/* =================================
-                SAVE / UPDATE
-            ================================= */}
             <button
               type="submit"
               form="timesheet-form"
               style={saveBtn}
             >
-              {editData
-                ? "Update"
-                : "Save"}
+              {editData ? "Update" : "Save"}
             </button>
           </div>
         </div>
@@ -642,100 +543,52 @@ if (!isAdmin) {
   );
 }
 
-/* =========================================
-   LABEL STYLE
-========================================= */
-
 const labelStyle = {
   fontWeight: "600",
-
   display: "block",
-
   marginBottom: "6px",
-
   fontSize: "15px",
-
   color: "#111827",
 };
-
-/* =========================================
-   INPUT STYLE
-========================================= */
 
 const inputStyle = {
   width: "100%",
-
   padding: "12px",
-
   marginBottom: "15px",
-
   border: "1px solid #d1d5db",
-
   borderRadius: "8px",
-
   fontSize: "15px",
-
   outline: "none",
-
   boxSizing: "border-box",
-
   background: "#ffffff",
-
   color: "#111827",
 };
 
-/* =========================================
-   SAVE BUTTON
-========================================= */
-
 const saveBtn = {
   background: "#2563eb",
-
   color: "#ffffff",
-
   border: "none",
-
   padding: "10px 20px",
-
   minWidth: "85px",
-
   minHeight: "40px",
-
   borderRadius: "8px",
-
   cursor: "pointer",
-
   fontWeight: "600",
-
   fontSize: "14px",
-
   flexShrink: 0,
 };
-
-/* =========================================
-   CANCEL BUTTON
-========================================= */
 
 const cancelBtn = {
   background: "#6b7280",
-
   color: "#ffffff",
-
   border: "none",
-
   padding: "10px 20px",
-
   minWidth: "85px",
-
   minHeight: "40px",
-
   borderRadius: "8px",
-
   cursor: "pointer",
-
   fontWeight: "600",
-
   fontSize: "14px",
-
   flexShrink: 0,
 };
+

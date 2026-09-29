@@ -1,3 +1,4 @@
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -18,12 +19,15 @@ from app.models.employee import Employee
 from app.schemas.employee import EmployeeCreate
 from app.utils.dependencies import get_current_user
 
+
 router = APIRouter(
     prefix="/employees",
     tags=["Employees"],
 )
 
+
 UPLOAD_FOLDER = "uploads"
+
 
 # =====================================================
 # Request Model
@@ -138,17 +142,45 @@ def create_employee(
             detail="Only Admin can create employees",
         )
 
-    existing = (
+    # =====================================================
+    # Check Duplicate Employee Code
+    # =====================================================
+
+    existing_code = (
         db.query(Employee)
-        .filter(Employee.EmailID == employee.EmailID)
+        .filter(
+            Employee.EmployeeCode == employee.EmployeeCode
+        )
         .first()
     )
 
-    if existing:
+    if existing_code:
         raise HTTPException(
             status_code=400,
-            detail="Employee already exists",
+            detail=f"Employee Code {employee.EmployeeCode} already exists",
         )
+
+    # =====================================================
+    # Check Duplicate Email
+    # =====================================================
+
+    existing_email = (
+        db.query(Employee)
+        .filter(
+            Employee.EmailID == employee.EmailID
+        )
+        .first()
+    )
+
+    if existing_email:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Email {employee.EmailID} already exists",
+        )
+
+    # =====================================================
+    # Create Employee
+    # =====================================================
 
     new_employee = Employee(
         EmployeeID=uuid4(),
@@ -195,7 +227,10 @@ def upload_photo(
             detail="Access denied",
         )
 
-    employee = get_employee_by_id(db, employee_id)
+    employee = get_employee_by_id(
+        db,
+        employee_id,
+    )
 
     extension = photo.filename.split(".")[-1].lower()
 
@@ -205,7 +240,10 @@ def upload_photo(
             detail="Only jpg, jpeg and png allowed",
         )
 
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    os.makedirs(
+        UPLOAD_FOLDER,
+        exist_ok=True,
+    )
 
     filename = f"{employee.EmployeeID}.{extension}"
 
@@ -215,7 +253,10 @@ def upload_photo(
     )
 
     with open(filepath, "wb") as buffer:
-        shutil.copyfileobj(photo.file, buffer)
+        shutil.copyfileobj(
+            photo.file,
+            buffer,
+        )
 
     employee.PhotoURL = f"/uploads/{filename}"
     employee.ModifiedDate = datetime.now()
@@ -227,6 +268,8 @@ def upload_photo(
         "message": "Photo uploaded successfully",
         "PhotoURL": employee.PhotoURL,
     }
+
+
 # =====================================================
 # Update Employee
 # =====================================================
@@ -248,7 +291,10 @@ def update_employee(
             detail="Access denied",
         )
 
-    employee = get_employee_by_id(db, employee_id)
+    employee = get_employee_by_id(
+        db,
+        employee_id,
+    )
 
     # =====================================================
     # Check Duplicate Employee Code
@@ -310,6 +356,8 @@ def update_employee(
             "PhotoURL": employee.PhotoURL,
         },
     }
+
+
 # =====================================================
 # Get Employee By ID
 # =====================================================
@@ -330,7 +378,10 @@ def get_employee(
             detail="Access denied",
         )
 
-    employee = get_employee_by_id(db, employee_id)
+    employee = get_employee_by_id(
+        db,
+        employee_id,
+    )
 
     return {
         "EmployeeID": str(employee.EmployeeID),
@@ -362,10 +413,16 @@ def delete_employee(
             detail="Only Admin can delete employees",
         )
 
-    employee = get_employee_by_id(db, employee_id)
+    employee = get_employee_by_id(
+        db,
+        employee_id,
+    )
 
     if employee.PhotoURL:
-        photo_path = employee.PhotoURL.replace("/", os.sep).lstrip(os.sep)
+        photo_path = employee.PhotoURL.replace(
+            "/",
+            os.sep,
+        ).lstrip(os.sep)
 
         if os.path.exists(photo_path):
             os.remove(photo_path)

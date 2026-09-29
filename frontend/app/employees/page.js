@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -17,9 +18,12 @@ export default function EmployeesPage() {
   const [authorized, setAuthorized] = useState(null);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user") || "null");
 
-    if (user?.RoleType === "Admin") {
+    if (
+      user?.RoleType === "Admin" ||
+      user?.role === "Admin"
+    ) {
       setAuthorized(true);
     } else {
       setAuthorized(false);
@@ -65,18 +69,27 @@ export default function EmployeesPage() {
     return employees
       .filter((emp) => {
         const matchesSearch =
-          emp.EmployeeName?.toLowerCase().includes(search.toLowerCase()) ||
-          emp.EmployeeCode?.toLowerCase().includes(search.toLowerCase()) ||
-          emp.EmailID?.toLowerCase().includes(search.toLowerCase());
+          emp.EmployeeName?.toLowerCase().includes(
+            search.toLowerCase()
+          ) ||
+          emp.EmployeeCode?.toLowerCase().includes(
+            search.toLowerCase()
+          ) ||
+          emp.EmailID?.toLowerCase().includes(
+            search.toLowerCase()
+          );
 
         const matchesDepartment =
-          department === "" || emp.Department === department;
+          department === "" ||
+          emp.Department === department;
 
         const matchesRole =
-          role === "" || emp.RoleType === role;
+          role === "" ||
+          emp.RoleType === role;
 
         const matchesStatus =
-          status === "" || emp.Status === status;
+          status === "" ||
+          emp.Status === status;
 
         return (
           matchesSearch &&
@@ -100,7 +113,13 @@ export default function EmployeesPage() {
 
         return codeA - codeB;
       });
-  }, [employees, search, department, role, status]);
+  }, [
+    employees,
+    search,
+    department,
+    role,
+    status,
+  ]);
 
   if (authorized === null) {
     return null;
@@ -117,7 +136,8 @@ export default function EmployeesPage() {
             padding: "40px",
             borderRadius: "12px",
             textAlign: "center",
-            boxShadow: "0 6px 20px rgba(0,0,0,.08)",
+            boxShadow:
+              "0 6px 20px rgba(0,0,0,.08)",
           }}
         >
           <h1
@@ -136,9 +156,11 @@ export default function EmployeesPage() {
               marginBottom: "30px",
             }}
           >
-            You do not have permission to access Employee Management.
+            You do not have permission to access
+            Employee Management.
             <br />
-            Only administrators can view and manage employees.
+            Only administrators can view and manage
+            employees.
           </p>
 
           <button
@@ -162,7 +184,6 @@ export default function EmployeesPage() {
 
   return (
     <MainLayout>
-
       <h1 style={{ marginBottom: "10px" }}>
         Employee Management
       </h1>
@@ -239,16 +260,32 @@ export default function EmployeesPage() {
 
           if (!confirmDelete) return;
 
-          await removeEmployee(employeeId);
+          try {
+            await removeEmployee(employeeId);
+          } catch (error) {
+            console.error(
+              "Employee delete failed:",
+              error
+            );
+
+            alert(
+              error?.message ||
+                "Unable to delete employee. Please try again."
+            );
+          }
         }}
         onViewTimesheets={(employee) => {
-          router.push(`/employees/${employee.EmployeeID}/timesheets`);
+          router.push(
+            `/employees/${employee.EmployeeID}/timesheets`
+          );
         }}
       />
 
       <EmployeeModal
         employee={selectedEmployee}
-        onClose={() => setSelectedEmployee(null)}
+        onClose={() =>
+          setSelectedEmployee(null)
+        }
       />
 
       <EmployeeForm
@@ -259,30 +296,33 @@ export default function EmployeesPage() {
           setEditingEmployee(null);
         }}
         onSave={async (data) => {
-  try {
-    if (editingEmployee) {
-      await editEmployee(
-        editingEmployee.EmployeeID,
-        data
-      );
-    } else {
-      await addEmployee(data);
-    }
+          try {
+            if (editingEmployee) {
+              await editEmployee(
+                editingEmployee.EmployeeID,
+                data
+              );
+            } else {
+              await addEmployee(data);
+            }
 
-    setShowForm(false);
-    setEditingEmployee(null);
+            setShowForm(false);
+            setEditingEmployee(null);
 
-  } catch (error) {
-    console.error("Employee save failed:", error);
+          } catch (error) {
+            console.error(
+              "Employee save failed:",
+              error
+            );
 
-    alert(
-      error?.message ||
-      "Unable to save employee. Please try again."
-    );
-  }
-}}
+            alert(
+              error?.message ||
+                "Unable to save employee. Please try again."
+            );
+          }
+        }}
       />
-
     </MainLayout>
   );
 }
+

@@ -1,3 +1,4 @@
+
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -15,6 +16,8 @@ router = APIRouter(
     prefix="/timesheet",
     tags=["Timesheet"]
 )
+
+
 # ==========================================
 # Get All Timesheets
 # ==========================================
@@ -73,6 +76,8 @@ def get_timesheets(
         )
         .all()
     )
+
+
 # ==========================================
 # Get Timesheets of One Employee (Admin)
 # ==========================================
@@ -149,7 +154,48 @@ def create_timesheet(
     current_user: dict = Depends(get_current_user),
 ):
 
-    employee_id = current_user["employee_id"]
+    today = date.today()
+
+    # ==========================================
+    # ADMIN
+    # Admin can add for any employee
+    # Admin has no 7-day restriction
+    # ==========================================
+    if current_user["role"] == "Admin":
+
+        if not timesheet.EmployeeID:
+            raise HTTPException(
+                status_code=400,
+                detail="EmployeeID is required for Admin"
+            )
+
+        employee_id = timesheet.EmployeeID
+
+    # ==========================================
+    # USER
+    # User can add only for own employee
+    # User can add only last 7 days
+    # Exactly 7 days old is allowed
+    # ==========================================
+    else:
+
+        employee_id = current_user["employee_id"]
+
+        days_difference = (
+            today - timesheet.WorkDate
+        ).days
+
+        if days_difference > 7:
+            raise HTTPException(
+                status_code=403,
+                detail="Timesheet can only be added for the last 7 days"
+            )
+
+        if days_difference < 0:
+            raise HTTPException(
+                status_code=403,
+                detail="Future date timesheets cannot be added"
+            )
 
     new_entry = Timesheet(
         EntryID=uuid4(),
@@ -202,8 +248,8 @@ def update_timesheet(
         )
 
     # ==========================================
-    # Employee can edit only own timesheet
-    # Admin can edit any employee timesheet
+    # USER
+    # Can edit only own timesheet
     # ==========================================
     if (
         current_user["role"] != "Admin"
@@ -216,26 +262,34 @@ def update_timesheet(
         )
 
     # ==========================================
-    # Employee can edit only current month
-    # Admin can edit any month
+    # USER DATE RESTRICTION
+    #
+    # User can edit:
+    # - Current date
+    # - Previous 7 days
+    #
+    # Exactly 7 days old is allowed
+    #
+    # Admin has NO date restriction
     # ==========================================
     if current_user["role"] != "Admin":
 
         today = date.today()
 
-        # Existing timesheet must belong to current month
-        if (
-            timesheet.WorkDate.month != today.month
-            or timesheet.WorkDate.year != today.year
-        ):
+        # Existing entry must not be older than 7 days
+        existing_days_difference = (
+            today - timesheet.WorkDate
+        ).days
+
+        if existing_days_difference > 7:
             raise HTTPException(
                 status_code=403,
-                detail="Past month timesheets cannot be edited"
+                detail="Timesheet can only be edited for the last 7 days"
             )
 
         # ==========================================
         # If WorkDate is changed,
-        # new date must also be in current month
+        # new date must also be within last 7 days
         # ==========================================
         if "WorkDate" in data.model_dump(
             exclude_unset=True
@@ -243,13 +297,20 @@ def update_timesheet(
 
             new_work_date = data.WorkDate
 
-            if (
-                new_work_date.month != today.month
-                or new_work_date.year != today.year
-            ):
+            new_days_difference = (
+                today - new_work_date
+            ).days
+
+            if new_days_difference > 7:
                 raise HTTPException(
                     status_code=403,
-                    detail="Timesheet date must remain in the current month"
+                    detail="Timesheet date can only be within the last 7 days"
+                )
+
+            if new_days_difference < 0:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Future date timesheets cannot be edited"
                 )
 
     # ==========================================
@@ -336,3 +397,4 @@ def delete_timesheet(
     return {
         "message": "Timesheet deleted successfully"
     }
+
