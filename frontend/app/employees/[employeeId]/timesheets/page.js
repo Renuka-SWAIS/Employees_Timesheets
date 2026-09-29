@@ -177,11 +177,12 @@ export default function EmployeeTimesheetsPage() {
       {/* Employee Profile Card */}
 
       {employee && (
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: "18px",
-            padding: "30px 35px",
+  <div
+    className="employee-profile-card"
+    style={{
+      background: "#fff",
+      borderRadius: "18px",
+      padding: "30px 35px",
             marginBottom: "30px",
             boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
             display: "flex",
@@ -223,9 +224,12 @@ export default function EmployeeTimesheetsPage() {
             />
           </div>
 
-          {/* Employee Details */}
+         {/* Employee Details */}
 
-          <div style={{ flex: 1 }}>
+<div
+  className="employee-profile-details"
+  style={{ flex: 1 }}
+>
             <h2
               style={{
                 margin: 0,
@@ -239,10 +243,11 @@ export default function EmployeeTimesheetsPage() {
             </h2>
 
             <div
-              style={{
-                display: "grid",
-                gridTemplateColumns:
-                  "repeat(2, minmax(250px, 1fr))",
+  className="employee-profile-grid"
+  style={{
+    display: "grid",
+    gridTemplateColumns:
+      "repeat(2, minmax(250px, 1fr))",
                 columnGap: "60px",
                 rowGap: "18px",
               }}
