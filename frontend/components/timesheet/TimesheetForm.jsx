@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { getTasks } from "../../services/task";
 import { getEmployees } from "../../services/employee";
 
@@ -30,7 +31,7 @@ export default function TimesheetForm({
   const [selectedTask, setSelectedTask] = useState(null);
 
   /* --------------------------------
-     LOAD EDIT DATA
+     LOAD EDIT DATA / RESET ADD FORM
   -------------------------------- */
   useEffect(() => {
     if (editData) {
@@ -45,11 +46,18 @@ export default function TimesheetForm({
     } else {
       setForm({
         ...initialState,
+        EmployeeID: "",
+        WorkDate: "",
+        TaskID: "",
+        Project: "",
+        TaskDescription: "",
+        HoursWorked: "",
+        Remarks: "",
         Month: new Date().getMonth() + 1,
         Year: new Date().getFullYear(),
       });
     }
-  }, [editData]);
+  }, [editData, open]);
 
   /* --------------------------------
      LOAD TASKS
@@ -183,7 +191,7 @@ export default function TimesheetForm({
     /* --------------------------------
        USER DATE RESTRICTION
     -------------------------------- */
-   if (!isAdmin && !editData) {
+    if (!isAdmin && !editData) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -201,6 +209,9 @@ export default function TimesheetForm({
       }
     }
 
+    /* --------------------------------
+       TASK VALIDATION
+    -------------------------------- */
     if (!form.TaskID) {
       alert("Please select a task.");
       return;
@@ -211,6 +222,9 @@ export default function TimesheetForm({
       return;
     }
 
+    /* --------------------------------
+       HOURS VALIDATION
+    -------------------------------- */
     if (!validateHours(form.HoursWorked)) {
       alert(
         "Invalid Hours.\n\n" +
@@ -224,6 +238,9 @@ export default function TimesheetForm({
       return;
     }
 
+    /* --------------------------------
+       PAYLOAD
+    -------------------------------- */
     const payload = {
       WorkDate: form.WorkDate,
       Month: new Date(form.WorkDate).getMonth() + 1,
@@ -280,6 +297,7 @@ export default function TimesheetForm({
             overscrollBehavior: "contain",
           }}
         >
+          {/* HEADER */}
           <div
             style={{
               padding: "18px 30px 14px 30px",
@@ -301,6 +319,7 @@ export default function TimesheetForm({
             </h2>
           </div>
 
+          {/* BODY */}
           <div
             className="timesheet-modal-body"
             style={{
@@ -316,13 +335,10 @@ export default function TimesheetForm({
             }}
           >
             <form id="timesheet-form" onSubmit={handleSubmit}>
-
               {/* ADMIN EMPLOYEE */}
               {isAdmin && (
                 <>
-                  <label style={labelStyle}>
-                    Employee
-                  </label>
+                  <label style={labelStyle}>Employee</label>
 
                   <select
                     name="EmployeeID"
@@ -331,9 +347,7 @@ export default function TimesheetForm({
                     style={inputStyle}
                     required
                   >
-                    <option value="">
-                      Select Employee
-                    </option>
+                    <option value="">Select Employee</option>
 
                     {employees.map((employee) => (
                       <option
@@ -591,4 +605,7 @@ const cancelBtn = {
   fontSize: "14px",
   flexShrink: 0,
 };
+
+
+
 

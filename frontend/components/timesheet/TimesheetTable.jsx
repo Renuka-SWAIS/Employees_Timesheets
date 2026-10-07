@@ -14,26 +14,57 @@ export default function TimesheetTable({
     return <h3>Loading Timesheets...</h3>;
   }
 
-  if (timesheets.length === 0) {
-    return <h3>No Timesheet Entries Found</h3>;
-  }
+  /*
+   * Current date
+   */
+  const today = new Date();
+
+  today.setHours(0, 0, 0, 0);
 
   /*
-   * Group timesheets by WorkDate
+   * Group only current/past timesheets by WorkDate.
+   *
+   * Future dates are excluded from the table.
    */
-  const groupedTimesheets = timesheets.reduce((groups, item) => {
-    const dateKey = item.WorkDate
-      ? item.WorkDate.split("T")[0]
-      : "unknown";
+  const groupedTimesheets = timesheets
+    .filter((item) => {
+      if (!item.WorkDate) {
+        return false;
+      }
 
-    if (!groups[dateKey]) {
-      groups[dateKey] = [];
-    }
+      const [year, month, day] = item.WorkDate
+        .split("T")[0]
+        .split("-")
+        .map(Number);
 
-    groups[dateKey].push(item);
+      const workDate = new Date(
+        year,
+        month - 1,
+        day
+      );
 
-    return groups;
-  }, {});
+      workDate.setHours(0, 0, 0, 0);
+
+      return workDate <= today;
+    })
+    .reduce((groups, item) => {
+      const dateKey = item.WorkDate.split("T")[0];
+
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+
+      groups[dateKey].push(item);
+
+      return groups;
+    }, {});
+
+  /*
+   * If there are no current/past entries
+   */
+  if (Object.keys(groupedTimesheets).length === 0) {
+    return <h3>No Timesheet Entries Found</h3>;
+  }
 
   /*
    * Format date without timezone issues
@@ -50,7 +81,11 @@ export default function TimesheetTable({
       .split("-")
       .map(Number);
 
-    const date = new Date(year, month - 1, day);
+    const date = new Date(
+      year,
+      month - 1,
+      day
+    );
 
     return {
       date: date.toLocaleDateString("en-GB", {
@@ -58,6 +93,7 @@ export default function TimesheetTable({
         month: "short",
         year: "numeric",
       }),
+
       day: date.toLocaleDateString("en-US", {
         weekday: "short",
       }),
@@ -81,6 +117,7 @@ export default function TimesheetTable({
 
   return (
     <div className="tableCard timesheet-table-card">
+
       <h2
         style={{
           marginBottom: "20px",
@@ -90,7 +127,9 @@ export default function TimesheetTable({
       </h2>
 
       <div className="timesheet-table-wrapper">
+
         <table className="timesheet-table">
+
           <thead>
             <tr>
               <th>Date</th>
@@ -99,13 +138,17 @@ export default function TimesheetTable({
               <th>Hours</th>
               <th>Remarks</th>
               <th>Entered By</th>
-              {!readOnly && <th>Actions</th>}
+
+              {!readOnly && (
+                <th>Actions</th>
+              )}
             </tr>
           </thead>
 
           <tbody>
             {Object.entries(groupedTimesheets).map(
               ([dateKey, entries]) => {
+
                 const formattedDate =
                   formatDate(dateKey);
 
@@ -114,8 +157,12 @@ export default function TimesheetTable({
 
                 return (
                   <React.Fragment key={dateKey}>
-                    {/* DATE GROUP HEADER */}
+
+                    {/* =====================================================
+                        DATE GROUP HEADER
+                        ===================================================== */}
                     <tr>
+
                       <td
                         colSpan={columnCount}
                         style={{
@@ -128,6 +175,7 @@ export default function TimesheetTable({
                           fontWeight: "600",
                         }}
                       >
+
                         <div
                           style={{
                             display: "flex",
@@ -138,6 +186,7 @@ export default function TimesheetTable({
                             flexWrap: "wrap",
                           }}
                         >
+
                           {/* Date + Day */}
                           <div
                             style={{
@@ -147,6 +196,7 @@ export default function TimesheetTable({
                               minWidth: 0,
                             }}
                           >
+
                             <span
                               style={{
                                 fontSize: "20px",
@@ -161,6 +211,7 @@ export default function TimesheetTable({
                                 minWidth: 0,
                               }}
                             >
+
                               <div
                                 style={{
                                   color: "#1e3a8a",
@@ -180,7 +231,9 @@ export default function TimesheetTable({
                               >
                                 {formattedDate.day}
                               </div>
+
                             </div>
+
                           </div>
 
                           {/* Entry Count + Total */}
@@ -192,6 +245,7 @@ export default function TimesheetTable({
                               flexWrap: "wrap",
                             }}
                           >
+
                             <span
                               style={{
                                 background: "#dbeafe",
@@ -200,7 +254,8 @@ export default function TimesheetTable({
                                 borderRadius: "20px",
                                 fontSize: "13px",
                                 fontWeight: "600",
-                                whiteSpace: "nowrap",
+                                whiteSpace:
+                                  "nowrap",
                               }}
                             >
                               {entries.length}{" "}
@@ -217,21 +272,31 @@ export default function TimesheetTable({
                                 borderRadius: "20px",
                                 fontSize: "13px",
                                 fontWeight: "600",
-                                whiteSpace: "nowrap",
+                                whiteSpace:
+                                  "nowrap",
                               }}
                             >
                               Total: {totalHours} hrs
                             </span>
+
                           </div>
+
                         </div>
+
                       </td>
+
                     </tr>
 
-                    {/* ENTRIES */}
+                    {/* =====================================================
+                        ENTRIES
+                        ===================================================== */}
                     {entries.map((item) => (
+
                       <tr key={item.EntryID}>
+
                         {/* Date */}
                         <td>
+
                           <div
                             style={{
                               fontWeight: "600",
@@ -249,6 +314,7 @@ export default function TimesheetTable({
                           >
                             {formattedDate.day}
                           </div>
+
                         </td>
 
                         {/* Project */}
@@ -285,7 +351,9 @@ export default function TimesheetTable({
                         {/* Actions */}
                         {!readOnly && (
                           <td>
+
                             <div className="timesheet-actions">
+
                               <button
                                 onClick={() =>
                                   onEdit(item)
@@ -303,18 +371,26 @@ export default function TimesheetTable({
                               >
                                 Delete
                               </button>
+
                             </div>
+
                           </td>
                         )}
+
                       </tr>
+
                     ))}
+
                   </React.Fragment>
                 );
               }
             )}
           </tbody>
+
         </table>
+
       </div>
+
     </div>
   );
 }

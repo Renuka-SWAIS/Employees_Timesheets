@@ -12,6 +12,18 @@ export default function Dashboard() {
 
   const [user, setUser] = useState(null);
 
+  // =====================================================
+  // Selected Month
+  // =====================================================
+  const today = new Date();
+
+  const [selectedMonth, setSelectedMonth] = useState(
+    new Date(today.getFullYear(), today.getMonth(), 1)
+  );
+
+  const selectedYear = selectedMonth.getFullYear();
+  const selectedMonthIndex = selectedMonth.getMonth();
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
@@ -23,9 +35,8 @@ export default function Dashboard() {
   const { timesheets, loading, error } = useTimesheet();
 
   // =====================================================
-  // Admin - My Work Summary
+  // My Work - Selected Month
   // =====================================================
-
   const myWork = useMemo(() => {
 
     if (!user || !timesheets) {
@@ -37,10 +48,25 @@ export default function Dashboard() {
 
     const myEmployeeId = String(user.EmployeeID || "");
 
-    const myTimesheets = timesheets.filter(
-      (item) =>
-        String(item.EmployeeID || "") === myEmployeeId
-    );
+    const myTimesheets = timesheets.filter((item) => {
+
+      if (
+        String(item.EmployeeID || "") !== myEmployeeId
+      ) {
+        return false;
+      }
+
+      if (!item.WorkDate) {
+        return false;
+      }
+
+      const workDate = new Date(item.WorkDate);
+
+      return (
+        workDate.getFullYear() === selectedYear &&
+        workDate.getMonth() === selectedMonthIndex
+      );
+    });
 
     const totalHours = myTimesheets.reduce(
       (sum, item) =>
@@ -50,7 +76,13 @@ export default function Dashboard() {
 
     const workingDays = new Set(
       myTimesheets
-        .map((item) => item.WorkDate)
+        .map((item) => {
+          if (!item.WorkDate) return null;
+
+          const date = new Date(item.WorkDate);
+
+          return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        })
         .filter(Boolean)
     ).size;
 
@@ -59,7 +91,23 @@ export default function Dashboard() {
       workingDays,
     };
 
-  }, [user, timesheets]);
+  }, [
+    user,
+    timesheets,
+    selectedYear,
+    selectedMonthIndex,
+  ]);
+
+  // =====================================================
+  // Month Display
+  // =====================================================
+  const monthDisplay = selectedMonth.toLocaleString(
+    "default",
+    {
+      month: "long",
+      year: "numeric",
+    }
+  );
 
   if (loading) {
     return <p>Loading Dashboard...</p>;
@@ -111,87 +159,98 @@ export default function Dashboard() {
         </div>
 
 
-        {/* Admin My Work */}
+        {/* =====================================================
+            My Work
+            Visible for Admin and Users
+            ===================================================== */}
 
-        {user?.RoleType === "Admin" && (
+        <div
+          style={{
+            minWidth: "280px",
+            padding: "14px 18px",
+            background: "#ffffff",
+            borderRadius: "10px",
+            border: "1px solid #e5e7eb",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+          }}
+        >
+
+          <h3
+            style={{
+              margin: 0,
+              marginBottom: "5px",
+              fontSize: "17px",
+              color: "#333",
+            }}
+          >
+            My Work
+          </h3>
+
           <div
             style={{
-              minWidth: "280px",
-              padding: "14px 18px",
-              background: "#ffffff",
-              borderRadius: "10px",
-              border: "1px solid #e5e7eb",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              fontSize: "12px",
+              color: "#777",
+              marginBottom: "10px",
+            }}
+          >
+            {monthDisplay}
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "28px",
             }}
           >
 
-            <h3
-              style={{
-                margin: 0,
-                marginBottom: "10px",
-                fontSize: "17px",
-                color: "#333",
-              }}
-            >
-              My Work
-            </h3>
-
-            <div
-              style={{
-                display: "flex",
-                gap: "28px",
-              }}
-            >
-
-              <div>
-                <div
-                  style={{
-                    fontSize: "13px",
-                    color: "#777",
-                  }}
-                >
-                  My Hours
-                </div>
-
-                <div
-                  style={{
-                    fontSize: "22px",
-                    fontWeight: "700",
-                    color: "#2563eb",
-                    marginTop: "3px",
-                  }}
-                >
-                  {myWork.totalHours}
-                </div>
+            <div>
+              <div
+                style={{
+                  fontSize: "13px",
+                  color: "#777",
+                }}
+              >
+                My Hours
               </div>
 
+              <div
+                style={{
+                  fontSize: "22px",
+                  fontWeight: "700",
+                  color: "#2563eb",
+                  marginTop: "3px",
+                }}
+              >
+                {myWork.totalHours.toFixed(1)}
+              </div>
+            </div>
 
-              <div>
-                <div
-                  style={{
-                    fontSize: "13px",
-                    color: "#777",
-                  }}
-                >
-                  Working Days
-                </div>
 
-                <div
-                  style={{
-                    fontSize: "22px",
-                    fontWeight: "700",
-                    color: "#2563eb",
-                    marginTop: "3px",
-                  }}
-                >
-                  {myWork.workingDays}
-                </div>
+            <div>
+              <div
+                style={{
+                  fontSize: "13px",
+                  color: "#777",
+                }}
+              >
+                Working Days
               </div>
 
+              <div
+                style={{
+                  fontSize: "22px",
+                  fontWeight: "700",
+                  color: "#2563eb",
+                  marginTop: "3px",
+                }}
+              >
+                {myWork.workingDays}
+              </div>
             </div>
 
           </div>
-        )}
+
+        </div>
 
       </div>
 
@@ -202,6 +261,8 @@ export default function Dashboard() {
 
       <DashboardCards
         timesheets={timesheets}
+        selectedMonth={selectedMonth}
+        setSelectedMonth={setSelectedMonth}
       />
 
 

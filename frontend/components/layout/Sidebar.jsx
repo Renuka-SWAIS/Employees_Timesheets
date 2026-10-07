@@ -44,6 +44,11 @@ export default function Sidebar() {
           icon: "📋",
         },
         {
+          name: "Reports",
+          path: "/reports",
+          icon: "📑",
+        },
+        {
           name: "Leaves",
           path: "/leaves",
           icon: "🌴",
