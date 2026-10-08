@@ -3439,3 +3439,111 @@ word-break: break-word !important;
   word-break: break-word !important;
   line-height: 1.45;
 }
+/* =========================================================
+   TASK REPORT - REMARKS TEXT WRAPPING
+   ========================================================= */
+
+.report-table td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.report-table td:nth-child(7),
+.report-table th:nth-child(7) {
+  width: 18%;
+  max-width: 18%;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   TASK REPORT - MOBILE NO OVERLAP
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .report-table-wrapper {
+    width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .report-table {
+    width: max-content !important;
+    min-width: 750px !important;
+    table-layout: fixed !important;
+  }
+
+  .report-table th,
+  .report-table td {
+    vertical-align: top !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+  }
+
+  /* Task ID */
+  .report-table th:nth-child(1),
+  .report-table td:nth-child(1) {
+    width: 130px !important;
+    min-width: 130px !important;
+    max-width: 130px !important;
+  }
+
+  /* Task */
+  .report-table th:nth-child(2),
+  .report-table td:nth-child(2) {
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+  }
+
+  /* Employee */
+  .report-table th:nth-child(3),
+  .report-table td:nth-child(3) {
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
+  }
+
+  /* Date */
+  .report-table th:nth-child(4),
+  .report-table td:nth-child(4) {
+    width: 85px !important;
+    min-width: 85px !important;
+    max-width: 85px !important;
+  }
+
+  /* Hours */
+  .report-table th:nth-child(5),
+  .report-table td:nth-child(5) {
+    width: 55px !important;
+    min-width: 55px !important;
+    max-width: 55px !important;
+  }
+
+  /* Project */
+  .report-table th:nth-child(6),
+  .report-table td:nth-child(6) {
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+  }
+
+  /* Remarks */
+  .report-table th:nth-child(7),
+  .report-table td:nth-child(7) {
+    width: 500px !important;
+    min-width: 500px !important;
+    max-width: 500px !important;
+
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    line-height: 1.35 !important;
+  }
+
+}
