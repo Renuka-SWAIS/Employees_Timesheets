@@ -322,10 +322,10 @@ export default function TimesheetTable({
                           {item.Project || "-"}
                         </td>
 
-                        {/* Task Description */}
-                        <td>
-                          {item.TaskDescription || "-"}
-                        </td>
+                       {/* Task Description */}
+<td className="timesheet-task-description">
+  {item.TaskDescription || "-"}
+</td>
 
                         {/* Hours */}
                         <td

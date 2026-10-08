@@ -1,7 +1,9 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import MainLayout from "../../components/layout/MainLayout";
 import { apiRequest } from "../../services/api";
@@ -518,6 +520,158 @@ export default function ReportsPage() {
   }
 
   // ==========================================
+  // EXPORT REPORT TO PDF
+  // ==========================================
+  function handleExportPDF() {
+    const doc = new jsPDF({
+      orientation:
+        reportType === "task"
+          ? "landscape"
+          : "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    const reportTitle =
+      reportType === "unfilled"
+        ? "Unfilled Dates Report"
+        : "Task ID Report";
+
+    // ========================================
+    // PDF TITLE
+    // ========================================
+    doc.setFontSize(18);
+    doc.setFont(undefined, "bold");
+    doc.text(reportTitle, 14, 18);
+
+    // ========================================
+    // DATE RANGE
+    // ========================================
+    doc.setFontSize(10);
+    doc.setFont(undefined, "normal");
+
+    doc.text(
+      `From Date: ${fromDate}    To Date: ${toDate}`,
+      14,
+      26
+    );
+
+    let tableHeaders = [];
+    let tableRows = [];
+
+    // ========================================
+    // UNFILLED DATES PDF
+    // ========================================
+    if (reportType === "unfilled") {
+      tableHeaders = [
+        "Employee",
+        "Unfilled Date",
+      ];
+
+      tableRows = unfilledReport.map(
+        (row) => [
+          row.employeeName,
+          row.date.toLocaleDateString(
+            "en-GB",
+            {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            }
+          ),
+        ]
+      );
+    }
+
+    // ========================================
+    // TASK REPORT PDF
+    // ========================================
+    if (reportType === "task") {
+      tableHeaders = [
+        "Task ID",
+        "Task",
+        "Employee",
+        "Date",
+        "Hours",
+        "Project",
+        "Remarks",
+      ];
+
+      tableRows = taskReport.map(
+        (row) => [
+          row.taskId || "",
+          row.taskName || "",
+          row.employeeName || "",
+          row.workDate.toLocaleDateString(
+            "en-GB",
+            {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            }
+          ),
+          row.hours ?? "",
+          row.project || "",
+          row.remarks ||
+            row.taskDescription ||
+            "",
+        ]
+      );
+    }
+
+    // ========================================
+    // PDF TABLE
+    // ========================================
+    autoTable(doc, {
+      startY: 32,
+      head: [tableHeaders],
+      body: tableRows,
+
+      theme: "grid",
+
+      styles: {
+        fontSize:
+          reportType === "task"
+            ? 7
+            : 9,
+        cellPadding: 2.5,
+        overflow: "linebreak",
+        valign: "top",
+      },
+
+      headStyles: {
+        fontStyle: "bold",
+      },
+
+      columnStyles:
+        reportType === "task"
+          ? {
+              0: { cellWidth: 38 },
+              1: { cellWidth: 45 },
+              2: { cellWidth: 32 },
+              3: { cellWidth: 25 },
+              4: { cellWidth: 18 },
+              5: { cellWidth: 30 },
+              6: { cellWidth: 55 },
+            }
+          : {
+              0: { cellWidth: 80 },
+              1: { cellWidth: 45 },
+            },
+    });
+
+    // ========================================
+    // DOWNLOAD PDF
+    // ========================================
+    const fileName =
+      reportType === "unfilled"
+        ? `Unfilled_Dates_Report_${fromDate}_to_${toDate}.pdf`
+        : `Task_ID_Report_${fromDate}_to_${toDate}.pdf`;
+
+    doc.save(fileName);
+  }
+
+  // ==========================================
   // REPORT TYPE CHANGE
   // ==========================================
   function handleReportTypeChange(e) {
@@ -688,14 +842,12 @@ export default function ReportsPage() {
                 </select>
               </div>
 
-              {/* From Date */}
               <DateInput
                 label="From Date"
                 value={fromDate}
                 onChange={setFromDate}
               />
 
-              {/* To Date */}
               <DateInput
                 label="To Date"
                 value={toDate}
@@ -721,9 +873,7 @@ export default function ReportsPage() {
                 }}
               >
 
-                {/* ==================================
-                    TASK DROPDOWN
-                ================================== */}
+                {/* TASK DROPDOWN */}
                 <div>
                   <label
                     style={{
@@ -974,9 +1124,7 @@ export default function ReportsPage() {
                   </small>
                 </div>
 
-                {/* ==================================
-                    EMPLOYEE
-                ================================== */}
+                {/* EMPLOYEE */}
                 <div>
                   <label
                     style={{
@@ -1059,9 +1207,7 @@ export default function ReportsPage() {
                 </div>
               </div>
 
-              {/* ==================================
-                  DATE FILTERS
-              ================================== */}
+              {/* DATE FILTERS */}
               <div
                 className="date-filter-grid"
                 style={{
@@ -1086,9 +1232,7 @@ export default function ReportsPage() {
             </>
           )}
 
-          {/* ====================================
-              GENERATE BUTTON
-          ==================================== */}
+          {/* GENERATE BUTTON */}
           <button
             className="generate-report-btn"
             onClick={handleGenerate}
@@ -1149,18 +1293,58 @@ export default function ReportsPage() {
                   Unfilled Dates
                 </h2>
 
-                <span
+                <div
                   style={{
-                    background: "#fff7ed",
-                    color: "#c2410c",
-                    padding: "7px 14px",
-                    borderRadius: "20px",
-                    fontWeight: "700",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    flexWrap: "wrap",
                   }}
                 >
-                  {unfilledReport.length}{" "}
-                  Unfilled
-                </span>
+                  <span
+                    style={{
+                      background: "#fff7ed",
+                      color: "#c2410c",
+                      padding: "7px 14px",
+                      borderRadius: "20px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    {unfilledReport.length}{" "}
+                    Unfilled
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={handleExportPDF}
+                    disabled={
+                      unfilledReport.length ===
+                      0
+                    }
+                    style={{
+                      background:
+                        "#16a34a",
+                      color: "#ffffff",
+                      border: "none",
+                      padding:
+                        "8px 14px",
+                      borderRadius: "8px",
+                      cursor:
+                        unfilledReport.length ===
+                        0
+                          ? "not-allowed"
+                          : "pointer",
+                      fontWeight: "600",
+                      opacity:
+                        unfilledReport.length ===
+                        0
+                          ? 0.5
+                          : 1,
+                    }}
+                  >
+                    📄 Export PDF
+                  </button>
+                </div>
               </div>
 
               {unfilledReport.length ===
@@ -1228,18 +1412,58 @@ export default function ReportsPage() {
                   Task Report
                 </h2>
 
-                <span
+                <div
                   style={{
-                    background: "#eff6ff",
-                    color: "#2563eb",
-                    padding: "7px 14px",
-                    borderRadius: "20px",
-                    fontWeight: "700",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    flexWrap: "wrap",
                   }}
                 >
-                  {taskReport.length}{" "}
-                  Entries
-                </span>
+                  <span
+                    style={{
+                      background: "#eff6ff",
+                      color: "#2563eb",
+                      padding: "7px 14px",
+                      borderRadius: "20px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    {taskReport.length}{" "}
+                    Entries
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={handleExportPDF}
+                    disabled={
+                      taskReport.length ===
+                      0
+                    }
+                    style={{
+                      background:
+                        "#16a34a",
+                      color: "#ffffff",
+                      border: "none",
+                      padding:
+                        "8px 14px",
+                      borderRadius: "8px",
+                      cursor:
+                        taskReport.length ===
+                        0
+                          ? "not-allowed"
+                          : "pointer",
+                      fontWeight: "600",
+                      opacity:
+                        taskReport.length ===
+                        0
+                          ? 0.5
+                          : 1,
+                    }}
+                  >
+                    📄 Export PDF
+                  </button>
+                </div>
               </div>
 
               {taskReport.length ===
@@ -1341,6 +1565,7 @@ function EmptyMessage({ text }) {
     </div>
   );
 }
+
 // ==========================================
 // REPORT TABLE
 // ==========================================
@@ -1376,3 +1601,4 @@ function ReportTable({
     </div>
   );
 }
+
